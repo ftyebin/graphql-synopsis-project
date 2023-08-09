@@ -1,0 +1,32 @@
+type Query {
+    synopsisPage (requestData: RequestData): SynopsisView,
+
+    getEuxpResult(
+        stbId: String,
+        synopsisSearchType: String,
+        lookupType: String,
+        menuStbServiceId: String,
+        episodeId: String
+    ) : EuxpResult,
+
+    getSmdResult(
+        mac: String,
+        stbId: String,
+        seriesId: String
+    ): SmdResult,
+
+    getScsResult(
+        stbId: String,
+        hashId: String,
+        uiName: String,
+        seriesId: String,
+        synopsisSearchType: String,
+        ppvProducts: [inputPpvProducts]
+    ): ScsResult
+}
+
+type SynopsisView {
+    euxpResult: EuxpResult,
+    smdResult: SmdResult,
+    scsResult: ScsResult
+}

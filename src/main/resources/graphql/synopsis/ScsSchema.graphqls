@@ -1,0 +1,15 @@
+type ScsResult {
+    IF: String
+    ver: String
+    ui_name: String
+    svc_name: String
+    result: String
+    reason: String
+    stb_id: String
+    mobile_id: String
+    is_bookmark: String # 북마크(즐겨찾기) 여부
+    yn_season_watch_all: String # 시즌 전체 시청 가능 여부
+    pps_products: String # 시즌 바로보기 여부 제공 상품리스트
+    last_watch_info: String # 시즌별 마지막 시청 정보 (데이터 미존재시 null)
+    ppv_products: [PpvProduct] # 최초 포커스된 바로보기 여부 제공 상품리스트
+}
