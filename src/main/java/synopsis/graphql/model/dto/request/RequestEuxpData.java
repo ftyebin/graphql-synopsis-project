@@ -16,6 +16,15 @@ public class RequestEuxpData implements GraphQLInputType {
     private String menuStbServiceId;
     private String episodeId;
 
+    public RequestEuxpData() { }
+
+    public RequestEuxpData(RequestData requestData){
+        this.stbId =  requestData.getStbId();
+        this.synopsisSearchType = requestData.getSynopsisSearchType();
+        this.lookupType = requestData.getLookupType();
+        this.menuStbServiceId = requestData.getMenuStbServiceId();
+        this.episodeId = requestData.getEpisodeId();
+    }
 
     @Override
     public TraversalControl accept(TraverserContext<GraphQLSchemaElement> context, GraphQLTypeVisitor visitor) {
