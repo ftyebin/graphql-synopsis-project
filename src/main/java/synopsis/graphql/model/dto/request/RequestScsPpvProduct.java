@@ -7,19 +7,17 @@ import graphql.util.TraversalControl;
 import graphql.util.TraverserContext;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Builder
 @Data
 public class RequestScsPpvProduct implements GraphQLInputType {
 
-    private final String productPriceId;
-    private final String isNScreen;
-    private final String productTypeCode;
-    private final  String purchasePreferenceRank;
-    private final String isPossession;
-    private final String episodeId;
+    private String productPriceId;
+    private String isNScreen;
+    private String productTypeCode;
+    private  String purchasePreferenceRank;
+    private String isPossession;
+    private String episodeId;
 
     @Override
     public TraversalControl accept(TraverserContext<GraphQLSchemaElement> context, GraphQLTypeVisitor visitor) {
