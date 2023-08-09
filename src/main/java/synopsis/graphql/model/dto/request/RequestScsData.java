@@ -20,6 +20,7 @@ public class RequestScsData implements GraphQLInputType {
     private List<RequestScsPpvProduct> ppvProducts;
 
     public RequestScsData() {}
+
     public RequestScsData(RequestData requestData) {
         this.stbId = requestData.getStbId();
         this.hashId = requestData.getHashId();

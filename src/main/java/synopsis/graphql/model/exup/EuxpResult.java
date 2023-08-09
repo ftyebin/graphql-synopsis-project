@@ -8,25 +8,23 @@ import graphql.schema.SchemaElementChildrenContainer;
 import graphql.util.TraversalControl;
 import graphql.util.TraverserContext;
 import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+
 @Data
-@RequiredArgsConstructor
 public class EuxpResult implements GraphQLOutputType {
-    public final String result;
-    public final String reason;
-    public final String request_time;
-    public final Contents contents;
-    public final List<Purchare> purchares;
-    public final List<Object> series;
-    public final int total_banner_count;
-    public final String response_time;
+    private String result;
+    public String reason;
+    public String request_time;
+    public Contents contents;
+    public List<Purchare> purchares;
+    public List<Object> series;
+    public int total_banner_count;
+    public String response_time;
     @JsonProperty("IF")
-    public final String iF;
-    public final List<Object> banners;
+    public String iF;
+    public List<Object> banners;
 
     @Override
     public List<GraphQLSchemaElement> getChildren() {
@@ -36,11 +34,6 @@ public class EuxpResult implements GraphQLOutputType {
     @Override
     public SchemaElementChildrenContainer getChildrenWithTypeReferences() {
         return GraphQLOutputType.super.getChildrenWithTypeReferences();
-    }
-
-    @Override
-    public GraphQLSchemaElement withNewChildren(SchemaElementChildrenContainer newChildren) {
-        return GraphQLOutputType.super.withNewChildren(newChildren);
     }
 
     @Override

@@ -8,22 +8,19 @@ import graphql.schema.GraphQLTypeVisitor;
 import graphql.util.TraversalControl;
 import graphql.util.TraverserContext;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-
 
 @Data
-@RequiredArgsConstructor
 public class SmdResult implements GraphQLOutputType {
-    public final String result;
-    public final String reason;
-    public final String dislike_total;
-    public final String updateDate_total;
-    public final String like_total;
-    public final String dislike;
-    public final String like;
+    public String result;
+    public String reason;
+    public String dislike_total;
+    public String updateDate_total;
+    public String like_total;
+    public String dislike;
+    public String like;
     @JsonProperty("IF")
-    public final String iF;
-    public final String updateDate;
+    public String iF;
+    public String updateDate;
 
     @Override
     public TraversalControl accept(TraverserContext<GraphQLSchemaElement> context, GraphQLTypeVisitor visitor) {

@@ -34,17 +34,14 @@ public class EuxpService {
         uriComponentsBuilder.queryParam("menu_stb_svc_id", requestEuxpData.getMenuStbServiceId());
         uriComponentsBuilder.queryParam("epsd_id", requestEuxpData.getEpisodeId());
         String url = uriComponentsBuilder.toUriString();
-        log.info("url = " + url);
-
-        String encodedUrl = url.replace("%25", "%");
-        log.info(encodedUrl);
 
         HttpEntity<Object> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(encodedUrl,
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
                 HttpMethod.GET,
                 entity,
-                String.class);
-
+                String.class
+        );
 
         log.info(response.getBody());
 
