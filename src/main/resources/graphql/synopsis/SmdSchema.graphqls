@@ -1,0 +1,11 @@
+type SmdResult {
+    result: String # 성공: OK, 실패: 에러코드
+    reason: String # 성공, 실패 이유
+    dislike_total: String # 콘텐츠 평가 별로에요 총점
+    updateDate_total: String # 콘텐츠 평점 총합 업데이트 날짜
+    like_total: String # 콘텐츠 평가 좋아요 총점
+    dislike: String # 사용자 평가 상태 (0: 미평가 상태, 1: 별로에요 선택 상태)
+    like: String # 사용자 평가 상태 (0: 미평가 상태, 1: 좋아요 선택 상태)
+    IF: String # 인터페이스 아이디
+    updateDate: String # 사용자 평가 업데이트 날짜
+}

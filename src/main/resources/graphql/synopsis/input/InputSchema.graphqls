@@ -1,0 +1,23 @@
+input RequestData{
+    stbId: String
+    mac: String
+    hashId: String
+    menuStvServiceId: String
+    seriesId: String
+    episodeId: String
+    menuId: String
+    lookupType: String
+    synopsisSearchType: String
+    uiName: String
+    ppvProducts: [inputPpvProducts]
+}
+
+input inputPpvProducts {
+    productPriceId: String
+    isNScreen: String
+    productTypeCode: String
+    purchasePreferenceRank: String
+    isPossession: String
+    episodeId: String
+}
+

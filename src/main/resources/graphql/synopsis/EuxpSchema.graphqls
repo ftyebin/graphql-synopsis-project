@@ -1,0 +1,395 @@
+type EuxpResult {
+    result: String
+    reason: String
+    request_time: String
+    total_banner_count: Int
+    response_time: String
+    IF: String
+    banners: [String]
+    series: [String]
+    purchares: [Purchares]
+    contents: Contents
+}
+
+
+type Purchares {
+    prd_typ_cd: String
+    sale_prc: Int
+    prd_prc_id: String
+    epsd_id: String
+    sris_id: String
+    use_yn: String
+    ppm_orgnz_fr_dt: String
+    purc_wat_to_dt: String
+    asis_prd_typ_cd: String
+    nscrn_yn: String
+    prd_prc_to_dt: String
+    sale_prc_vat: Int
+    prd_prc: Int
+    epsd_rslu_id: String
+    rslu_typ_cd: String
+    possn_yn: String
+    lag_capt_typ_exps_yn: String
+    brcast_avl_perd_yn: String
+    prd_prc_fr_dt: String
+    dsc_typ_cd: String
+    ppm_orgnz_to_dt: String
+    next_prd_prc_fr_dt: String
+    next_free_prd_prc_fr_dt: String
+    next_prd_prc_typ_cd: String
+    next_sale_prc_vat: Int
+    purc_pref_rank: String
+    lag_capt_typ_cd: String
+    prd_prc_vat: Int
+    expire_prd_prc_dt: String
+    purc_wat_dd_fg_cd: String
+    purc_wat_dd_cnt: Int
+    ppm_grid_icon_img_path: String
+    ppm_prd_nm: String
+    ppm_prd_typ_cd: String
+    sale_tgt_fg_yn: String
+    ppm_free_join_yn: String
+    ppm_free_join_perd_cd: String
+    poc_det_typ_cd_list: [String]
+}
+
+type BtvPntInfo {
+    btv_pnt: Int
+    btv_like_ncnt: Int
+    btv_like_rate: Float
+    btv_ngood_ncnt: Int
+    btv_ngood_rate: Float
+}
+
+type DistInfo {
+    pnt: Float
+    dist_rate: Int
+}
+
+type Sites {
+    site_cd: String
+    site_nm: String
+    bas_pnt: Int
+    avg_pnt: Float
+    review_cnt: Int
+    dist_info: [DistInfo]
+    reviews: [String]
+}
+
+type TmdbPntInfo {
+    tmdb_pnt: Float
+    tmdb_pnt_user_ncnt: Int
+}
+
+# PPM 무료 구매(차감) 가능한 omni 팩 상품 정보
+type OmniPpmInfo {
+    omni_m_pid: String
+    omni_m_pnmae: String # omni 팩 월정액 상품명
+    omni_m_total_count: String # 월 구매 가능한 ppv 총 구매 건수
+    omni_m_use_count: String # 구매한 ppv 구매 건수
+    omni_m_rest_count: String # omni 팩 월 구매 가능한 ppv 남은 구매 건수
+    omni_m_rest_count_valid_date: String # omni 팩 월 구매 가능한 ppv 구매 건수 유효일 (갱신 예정일 - 1일
+}
+
+# 최초 포커스된 바로보기 여부 제공 상픔 리스트
+type PpvProduct {
+    prd_prc_id: String
+    epsd_id: String
+    yn_directview: String # 시청 가능 여부 (Y/N)
+    yn_purchase: String # 구매 여부 (Y/N) - 대여/소장용 PPV/PPS/PPP, 월정액의 구매여부 제공
+    end_date: String # 상품 구매 만료일 (yyyy.MM.dd)
+    end_date_hhmm: String # 상품 구매 만료 일시 (yyyy.MM.dd HH:mm)
+    period: String # 직접구매 (대여:9, 0이면 만료임박, 소장용/월정액/미구매: -1)
+    period_hour: String
+    period_min: String
+    yn_recv_gift: String # 받은 선물 여부 (Y: 받은선물, N: 직접구매)
+    recv_gift_sts_cd: String # 받은 선물 상태 (RS: 받은선물 미시청, RC: 받은선물 시청, 직접구매인경우 빈값)
+    ppm_free_join_yn: String # PPM 무료 가입 기간 적용 여부
+    ppm_free_join_perd_cd: String
+    ppm_free_join_perd_end_dt: String
+    use_ppv_omni_ppm_info: [OmniPpmInfo] # PPM 무료 구매(차감) 가능한 omni 팩 상품 정보들
+}
+# 일반 시놉시스 바로 보기
+
+# 기존 MeTV에서 서비스 하는 시놉시스 바로보기 버튼 전환을 위한 POST API
+# 시놉 진입 시 상품에 대한 정보를 요청하면 상품에 대한 구매 권한 정보를 단말에 전달
+# VOD 즐겨찾기 여부 및 시즌 마지막 시청 정보는 MeTV API를 연동해서 정보를 획득하여 구성
+# Client: STB, Mobile
+type DirectView {
+    IF: String
+    ver: String
+    ui_name: String
+    svc_name: String
+    result: String
+    reason: String
+    stb_id: String
+    mobile_id: String
+    is_bookmark: String # 북마크(즐겨찾기) 여부
+    yn_season_watch_all: String # 시즌 전체 시청 가능 여부
+    pps_products: String # 시즌 바로보기 여부 제공 상품리스트
+    last_watch_info: String # 시즌별 마지막 시청 정보 (데이터 미존재시 null)
+    ppv_products: [PpvProduct] # 최초 포커스된 바로보기 여부 제공 상품리스트
+}
+
+type SiteReview {
+    sris_id: String
+    prize_history: [String]
+    btv_pnt_info: [BtvPntInfo]
+    sites: [Sites]
+    tmdb_pnt_info: TmdbPntInfo
+}
+
+type Peoples {
+    prs_id: String
+    prs_nm: String
+    prs_plrl_nm: String
+    prs_role_cd: String
+    prs_role_nm: String
+    brth_ymd: String
+    img_path: String
+    sort_seq: Int
+}
+
+type EpsdRsluInfo {
+    epsd_rslu_id: String
+    rslu_typ_cd: String
+    encd_piqu_typ_cd: String
+    pcim_addn_typ_cd: String
+    possn_yn: String
+    capt_yn: String
+    matl_sts_cd: String
+    capt_svc_file_path: String
+    lag_capt_typ_cd: String
+    mtx_capt_yn: String
+    mtx_capt_svc_file_path: String
+    ai_capt_yn: String
+    ai_capt_svc_file_path: String
+    preview_time: String
+    rtsp_cnt_url: String
+    mda_file_path: String
+    openg_tmtag_tmsc: Int
+    endg_tmtag_tmsc: Int
+    prd_prc_fr_dt: String
+    prd_prc_to_dt: String
+    capt_lans: [String]
+}
+
+type StillCut {
+    img_path: String
+}
+
+type Genres {
+    rep_gnr_yn: String
+    gnr_id: String
+    meta_gnr_nm: String
+}
+
+type Preview {
+    title: String
+    prd_prc_id: String
+    pcim_addn_typ_nm: String
+    epsd_id: String
+    epsd_rslu_id: String
+    img_path: String
+    play_tms_val: String
+    rtsp_cnt_url: String
+}
+
+type PossBgImg {
+    img_path: String
+}
+
+type Contents {
+    sris_id: String
+    sris_typ_cd: String
+    svc_typ_cd: String
+    title: String
+    meta_sub_typ_cd: String
+    meta_title_colr_val: String
+    prev_sris_id: String
+    prev_epsd_id: String
+    next_sris_id: String
+    next_epsd_id: String
+    first_sris_id: String
+    last_sris_id: String
+    svc_fr_dt: String
+    svc_to_dt: String
+    dist_sts_cd: String
+    epsd_dist_sts_cd: String
+    sson_choic_nm: String
+    brcast_chnl_nm: String
+    sris_snss_cts: String
+    sris_cmpt_yn: String
+    bg_img_path: String
+    dark_img_yn: String
+    vc_bg_img_path: String
+    vc_dark_img_yn: String
+    title_img_path: String
+    chrtr_ai_typ_cd: String
+    sris_poster_filename_v: String
+    sris_poster_filename_h: String
+    aprc_pt_cts: String
+    aprc_pt_cts_colr_val: String
+    open_yr: String
+    thtr_ver_yn: String
+    btv_pplr_yn: String
+    kids_yn: String
+    lag_capt_typ_exps_yn: String
+    brcast_avl_perd_yn: String
+    series_info: String
+    sris_sales_comt_title: String
+    sris_sales_comt_cts: String
+    sris_sales_comt_exps_mthd_cd: String
+    sris_sales_comt_scn_mthd_cd: String
+    sris_sales_comt_img_path: String
+    sris_sales_comt_call_typ_cd: String
+    sris_sales_comt_call_url: String
+    sris_sales_comt_call_objt_id: String
+    sris_sales_vas_svc_id: String
+    sris_sales_vas_itm_id: String
+    sris_evt_comt_title: String
+    sris_evt_comt_cts: String
+    sris_evt_comt_exps_mthd_cd: String
+    sris_evt_comt_scn_mthd_cd: String
+    sris_evt_comt_img_path: String
+    sris_evt_comt_call_typ_cd: String
+    sris_evt_comt_call_url: String
+    sris_evt_comt_call_objt_id: String
+    sris_evt_vas_svc_id: String
+    sris_evt_vas_itm_id: String
+    sris_evt_comt_title2: String
+    sris_evt_comt_cts2: String
+    sris_evt_comt_exps_mthd_cd2: String
+    sris_evt_comt_img_path2: String
+    sris_evt_comt_call_typ_cd2: String
+    sris_evt_comt_call_url2: String
+    mob_sris_sales_comt_title: String
+    mob_sris_sales_comt_cts: String
+    mob_sris_sales_comt_exps_mthd_cd: String
+    mob_sris_evt_comt_title: String
+    mob_sris_evt_comt_cts: String
+    mob_sris_evt_comt_exps_mthd_cd: String
+    mob_sris_evt_comt_scn_mthd_cd: String
+    mob_sris_evt_comt_img_path: String
+    mob_sris_evt_comt_img_bagr_colr_val: String
+    mob_sris_evt_comt_call_typ_cd: String
+    mob_sris_evt_comt_call_url: String
+    mob_sris_evt_comt_call_objt_id: String
+    epsd_id: String
+    orgn_epsd_id: String
+    brcast_tseq_nm: String
+    brcast_dy: String
+    brcast_exps_dy: String
+    adlt_lvl_cd: String
+    meta_typ_cd: String
+    sub_title: String
+    epsd_snss_cts: String
+    wat_lvl_cd: String
+    nscrn_yn: String
+    gstn_yn: String
+    rcmd_yn: String
+    pcim_dimn_cd: String
+    combine_product_yn: String
+    cacbro_yn: String
+    cacbro_cd: String
+    cacbro_cts: String
+    mob_mda_capt_yn: String
+    mob_mda_file_path: String
+    seeking_img_path: String
+    mtx_capt_yn: String
+    cw_call_id_val: String
+    has_inside_meta: String
+    has_scene_meta: String
+    tpcc_comt: String
+    epsd_poster_filename_h: String
+    epsd_poster_filename_v: String
+    epsd_sales_comt_title: String
+    epsd_sales_comt_cts: String
+    epsd_sales_comt_exps_mthd_cd: String
+    epsd_sales_comt_scn_mthd_cd: String
+    epsd_sales_comt_img_path: String
+    epsd_sales_comt_call_typ_cd: String
+    epsd_sales_comt_call_url: String
+    epsd_sales_comt_call_objt_id: String
+    epsd_sales_vas_svc_id: String
+    epsd_sales_vas_itm_id: String
+    epsd_evt_comt_title: String
+    epsd_evt_comt_cts: String
+    epsd_evt_comt_img_path: String
+    epsd_evt_comt_exps_mthd_cd: String
+    epsd_evt_comt_scn_mthd_cd: String
+    epsd_evt_comt_call_typ_cd: String
+    epsd_evt_comt_call_url: String
+    epsd_evt_comt_call_objt_id: String
+    epsd_evt_vas_svc_id: String
+    epsd_evt_vas_itm_id: String
+    mob_epsd_sales_comt_title: String
+    mob_epsd_sales_comt_cts: String
+    mob_epsd_sales_comt_exps_mthd_cd: String
+    mob_epsd_evt_comt_title: String
+    mob_epsd_evt_comt_cts: String
+    mob_epsd_evt_comt_img_path: String
+    mob_epsd_evt_comt_img_bagr_colr_val: String
+    mob_epsd_evt_comt_exps_mthd_cd: String
+    mob_epsd_evt_comt_scn_mthd_cd: String
+    mob_epsd_evt_comt_call_typ_cd: String
+    mob_epsd_evt_comt_call_url: String
+    mob_epsd_evt_comt_call_objt_id: String
+    pre_exam_yn: String
+    trailer_view_yn: String
+    snd_typ_cd: String
+    play_tms_val: String
+    play_time: String
+    rslu_typ_cd: String
+    director: String
+    actor: String
+    guest: String
+    chrtr: String
+    corners: String
+    ending_cw_call_id_val: String
+    menu_id: String
+    session_id: String
+    track_id: String
+    cw_call_id: String
+    quiz_yn: String
+    quiz_call_url: String
+    epsd_exps_typ_cd: String
+    pblsr_nm: String
+    vod_svc_yn: String
+    rsv_orgnz_yn: String
+    smtn_wat_abl_yn: String
+    contrp_id: String
+    pcim_fr_tmsc: Int
+    pcim_lvl_exps_yn: String
+    pcim_lvl_cls_no: String
+    pcim_lvl_cls_dy: String
+    pcim_lvl1_exps_yn: String
+    pcim_lvl2_exps_yn: String
+    pcim_lvl3_exps_yn: String
+    pcim_lvl4_exps_yn: String
+    pcim_lvl5_exps_yn: String
+    pcim_lvl6_exps_yn: String
+    pcim_lvl7_exps_yn: String
+    pcim_lvl1_wat_age_cd: String
+    pcim_lvl2_wat_age_cd: String
+    pcim_lvl3_wat_age_cd: String
+    pcim_lvl4_wat_age_cd: String
+    pcim_lvl5_wat_age_cd: String
+    pcim_lvl6_wat_age_cd: String
+    pcim_lvl7_wat_age_cd: String
+    wat_lvl_phrs: String
+    manufco_nm: String
+    audio_lag_typ_cd: String
+    otts: [String]
+    site_review: SiteReview
+    peoples: [Peoples]
+    epsd_rslu_info: [EpsdRsluInfo]
+    all_ai_inside_scenes: [String]
+    ai_inside_scenes: [String]
+    products: [String]
+    stillCut: [StillCut]
+    genres: [Genres]
+    special: [String]
+    preview: [Preview]
+    poss_bg_img: [PossBgImg]
+}
