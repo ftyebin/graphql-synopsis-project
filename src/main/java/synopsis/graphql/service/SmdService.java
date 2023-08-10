@@ -25,12 +25,11 @@ public class SmdService {
         HttpHeaders headers = new HttpHeaders();
         smdConfig.getHeaders().forEach(headers::set);
 
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(smdConfig.getUrl());
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(smdConfig.getUrl())
+                .queryParam("mac_address", requestSmdData.getMac())
+                .queryParam("stb_id", requestSmdData.getStbId())
+                .queryParam("series_id", requestSmdData.getSeriesId());
         smdConfig.getParams().forEach(uriComponentsBuilder::queryParam);
-
-        uriComponentsBuilder.queryParam("mac_address", requestSmdData.getMac());
-        uriComponentsBuilder.queryParam("stb_id", requestSmdData.getStbId());
-        uriComponentsBuilder.queryParam("series_id", requestSmdData.getSeriesId());
 
         String url = uriComponentsBuilder.toUriString();
 

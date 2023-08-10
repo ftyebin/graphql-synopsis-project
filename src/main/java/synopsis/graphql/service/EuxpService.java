@@ -25,14 +25,18 @@ public class EuxpService {
         HttpHeaders headers = new HttpHeaders();
         euxpConfig.getHeaders().forEach(headers::set);
 
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(euxpConfig.getUrl());
+        log.info(requestEuxpData.getMenuStbServiceId());
+
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(euxpConfig.getUrl())
+                .queryParam("stb_id", requestEuxpData.getStbId())
+                .queryParam("search_type", requestEuxpData.getSynopsisSearchType())
+                .queryParam("yn_recent", requestEuxpData.getLookupType())
+                .queryParam("menu_stb_svc_id", requestEuxpData.getMenuStbServiceId())
+                .queryParam("epsd_id", requestEuxpData.getEpisodeId());
+
         euxpConfig.getParams().forEach(uriComponentsBuilder::queryParam);
 
-        uriComponentsBuilder.queryParam("stb_id", requestEuxpData.getStbId());
-        uriComponentsBuilder.queryParam("search_type", requestEuxpData.getSynopsisSearchType());
-        uriComponentsBuilder.queryParam("yn_recent", requestEuxpData.getLookupType());
-        uriComponentsBuilder.queryParam("menu_stb_svc_id", requestEuxpData.getMenuStbServiceId());
-        uriComponentsBuilder.queryParam("epsd_id", requestEuxpData.getEpisodeId());
+        log.info(uriComponentsBuilder.build().getQuery());
         String url = uriComponentsBuilder.toUriString();
 
         HttpEntity<Object> entity = new HttpEntity<>(headers);
