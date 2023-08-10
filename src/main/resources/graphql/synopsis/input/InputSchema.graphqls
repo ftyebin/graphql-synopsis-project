@@ -2,7 +2,7 @@ input RequestData{
     stbId: String
     mac: String
     hashId: String
-    menuStvServiceId: String
+    menuStbServiceId: String
     seriesId: String
     episodeId: String
     menuId: String
