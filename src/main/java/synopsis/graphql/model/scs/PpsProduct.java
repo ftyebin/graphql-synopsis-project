@@ -1,13 +1,6 @@
 package synopsis.graphql.model.scs;
 
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLSchemaElement;
-import graphql.schema.GraphQLTypeVisitor;
-import graphql.util.TraversalControl;
-import graphql.util.TraverserContext;
-
-
-public class PpsProduct implements GraphQLOutputType {
+public class PpsProduct {
 
     public String prd_prc_id;
     public String epsd_id;
@@ -24,15 +17,4 @@ public class PpsProduct implements GraphQLOutputType {
     public Object ppm_free_join_perd_cd;
     public Object ppm_free_join_perd_end_dt;
     public Object use_ppv_omni_ppm_info;
-
-
-    @Override
-    public TraversalControl accept(TraverserContext<GraphQLSchemaElement> context, GraphQLTypeVisitor visitor) {
-        return null;
-    }
-
-    @Override
-    public GraphQLSchemaElement copy() {
-        return null;
-    }
 }
