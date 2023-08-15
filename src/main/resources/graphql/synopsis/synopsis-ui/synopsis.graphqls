@@ -1,0 +1,269 @@
+type ViewPage {
+    # banners: SynopsisBanner
+    title: ContentsTitle
+    details: ContentsDetail
+    contentsAdditional: ContentsAdditional
+    # userPreference: UserContentsPreference
+    # episodeList: ContentsEpisodeList
+    # purchaseInfo: PurchaseInfo
+    playInfo: PlayInfo
+}
+
+type SynopsisBanner {
+    imageBanner: SynopsisImageBanner
+    textBanner: SynopsisTextBanner
+    plccBanner: SynopsisPlccBanner
+}
+
+type SynopsisImageBanner {
+    imagePath: String
+    callTypeCode: String
+    callUrl: String
+    vasId: String
+    vasServiceId: String
+
+}
+
+type SynopsisTextBanner {
+    text: String
+    callTypeCode: String
+    callUrl: String
+    vasId: String
+    vasServiceId: String
+}
+
+type SynopsisPlccBanner {
+    imagePath: String
+    callTypeCode: String
+    callUrl: String
+    vasId: String
+    vasServiceId: String
+}
+
+type ContentsTitle {
+    imageTitle: ContentsImageTitle
+    textTitle: ContentsTextTitle
+}
+
+type ContentsImageTitle {
+    isDark: Boolean # dark_img_yn
+    imagePath: String # title_img_path
+}
+
+type ContentsTextTitle {
+    text: String # title
+}
+
+type ContentsDetail {
+    metaInfo: MetaInfo
+    summary: String # epsd_snss_cts
+    castInfos: [Cast]
+    prizeInfos: [Prize]
+}
+
+# https://confluence.skbroadband.com/pages/viewpage.action?pageId=386920272
+type MetaInfo {
+    isNew: Boolean
+    # 단편
+    #(sris_typ_cd == 02)
+    #AND
+    #(
+    #애니 극장판
+    #(meta_typ_cd == 006 && thtr_ver_yn == Y)
+    #OR
+    #영화
+    #(meta_typ_cd == 000)
+    #)
+    #AND
+    #현재 일자가 서비스 시작일 + 13일 이하
+    #(현재 일자 <= svc_fr_dt 가공 후 일자 추출 + 13)
+    isMasterpiece: Boolean
+    isBtvPopular: Boolean
+    isMultiLang: Boolean
+    isDubbing: Boolean
+    isRemastered: Boolean
+    isPrize: Boolean
+    isBroadcasting: Boolean
+    sound: String
+    btvReview: String
+    watchaReview: String
+    openYear: String
+    broadcastingDate: String
+    watchLevel: String
+    runningTime: String
+    resolution: String
+    subtitle: String
+    heroImg: String
+}
+
+type Cast {
+    birth: String # brth_ymd
+    imagePath: String # img_path
+    id: String # prs_id
+    actorName: String # prs_nm
+    castingName: String # prs_plrl_nm
+    roleCode: String # prs_role_cd
+    roleName: String # prs_role_nm
+}
+
+type Prize {
+    name: String # prize_history > awardc_nm
+    description: String # prize_histroy > prize_dts_cts
+    year: String # prize_Yr
+}
+
+type ContentsAdditional {
+    stillCut: [StillCut]
+    similarContents: SimilarContents
+}
+
+type SimilarContents {
+    callId: String # cw_call_id_val
+}
+
+
+type UserContentsPreference {
+    likeInfo: LikeInfo,
+    bookmark: Boolean
+}
+
+# 미 등록, 좋아요, 싫어요
+enum LikeInfo {
+    NONE
+    LIKE
+    DISLIKE
+}
+
+type ContentsEpisodeList {
+    list: [ContentsEpisode]
+}
+
+type ContentsEpisode {
+    imagePath: String # poster_filename_h | poster_filename_v
+    episodeNumber: String # brcast_tseq_nm
+    # watchedProgress: Number
+    isNotBroadcasted: Boolean # cacbro_yn
+}
+
+type PurchaseInfo {
+    freeProducts: [FreeProduct]
+    purchasedProducts: [PurchasedProduct]
+    purchasableProducts: [PurchasableProduct]
+}
+
+interface Product {
+    productTypeCode: String # prd_typ_cd
+    episodeId: String # epsd_id
+    episodeResolutionId: String # epsd_rslu_id
+    discountTypeCode: String # dsc_typ_cd
+    languageCaptionTypeCode: String # lag_capt_typ_cd
+    isNscreen: Boolean # nscrn_yn
+    isPossession: Boolean # possn_yn
+    isPpmFreeJoin: Boolean # ppm_free_join_yn
+    ppmGridIconImagePath: String # ppm_grid_icon_img_path
+    ppmProductName: String # ppm_prd_nm
+    productPriceId: String # prd_prc_id
+    productPriceVat: Int # prd_prc_vat
+    salePrice: Int # sale_prc
+    salePriceVat: Int # sale_prc_vat
+    # purchares > purc_wat_dd_cnt + purc_wat_dd_fg_cd 두 필드 합쳐서 문자열 형태로 전달
+    purchasePreferenceRank: String
+    purchasedWatchedCount: String
+    resolutionTypeCode: String # purchares > rslu_typ_cd
+    isUsed: Boolean # purchares > use_yn
+    isReservation: Boolean # rsv_orgnz_yn
+}
+
+type FreeProduct implements Product {
+    productTypeCode: String # prd_typ_cd
+    episodeId: String # epsd_id
+    episodeResolutionId: String # epsd_rslu_id
+    discountTypeCode: String # dsc_typ_cd
+    languageCaptionTypeCode: String # lag_capt_typ_cd
+    isNscreen: Boolean # nscrn_yn
+    isPossession: Boolean # possn_yn
+    isPpmFreeJoin: Boolean # ppm_free_join_yn
+    ppmGridIconImagePath: String # ppm_grid_icon_img_path
+    ppmProductName: String # ppm_prd_nm
+    productPriceId: String # prd_prc_id
+    productPriceVat: Int # prd_prc_vat
+    salePrice: Int # sale_prc
+    salePriceVat: Int # sale_prc_vat
+    # purchares > purc_wat_dd_cnt + purc_wat_dd_fg_cd 두 필드 합쳐서 문자열 형태로 전달
+    purchasePreferenceRank: String
+    purchasedWatchedCount: String
+    resolutionTypeCode: String # purchares > rslu_typ_cd
+    isUsed: Boolean # purchares > use_yn
+    isReservation: Boolean # rsv_orgnz_yn
+
+}
+
+type PurchasedProduct implements Product {
+    productTypeCode: String # prd_typ_cd
+    episodeId: String # epsd_id
+    episodeResolutionId: String # epsd_rslu_id
+    discountTypeCode: String # dsc_typ_cd
+    languageCaptionTypeCode: String # lag_capt_typ_cd
+    isNscreen: Boolean # nscrn_yn
+    isPossession: Boolean # possn_yn
+    isPpmFreeJoin: Boolean # ppm_free_join_yn
+    ppmGridIconImagePath: String # ppm_grid_icon_img_path
+    ppmProductName: String # ppm_prd_nm
+    productPriceId: String # prd_prc_id
+    productPriceVat: Int # prd_prc_vat
+    salePrice: Int # sale_prc
+    salePriceVat: Int # sale_prc_vat
+    # purchares > purc_wat_dd_cnt + purc_wat_dd_fg_cd 두 필드 합쳐서 문자열 형태로 전달
+    purchasePreferenceRank: String
+    purchasedWatchedCount: String
+    resolutionTypeCode: String # purchares > rslu_typ_cd
+    isUsed: Boolean # purchares > use_yn
+    isReservation: Boolean # rsv_orgnz_yn
+}
+
+type PurchasableProduct implements Product {
+    productTypeCode: String # prd_typ_cd
+    episodeId: String # epsd_id
+    episodeResolutionId: String # epsd_rslu_id
+    discountTypeCode: String # dsc_typ_cd
+    languageCaptionTypeCode: String # lag_capt_typ_cd
+    isNscreen: Boolean # nscrn_yn
+    isPossession: Boolean # possn_yn
+    isPpmFreeJoin: Boolean # ppm_free_join_yn
+    ppmGridIconImagePath: String # ppm_grid_icon_img_path
+    ppmProductName: String # ppm_prd_nm
+    productPriceId: String # prd_prc_id
+    productPriceVat: Int # prd_prc_vat
+    salePrice: Int # sale_prc
+    salePriceVat: Int # sale_prc_vat
+    # purchares > purc_wat_dd_cnt + purc_wat_dd_fg_cd 두 필드 합쳐서 문자열 형태로 전달
+    purchasePreferenceRank: String
+    purchasedWatchedCount: String
+    resolutionTypeCode: String # purchares > rslu_typ_cd
+    isUsed: Boolean # purchares > use_yn
+    isReservation: Boolean # rsv_orgnz_yn
+}
+
+
+type PlayInfo {
+    mainPreviewPlay: MainPreviewPlay
+    # aiHighlightPlay: AIHighlightPlay
+    trailerPlay: TrailerPlay
+    # cornerPlays: [CornerPlay]
+    # specialPlays: [SpecialPlay]
+}
+
+type MainPreviewPlay {
+    episodeId: String # epsd_id
+    seriesId: String # contents > sris_id
+    episodeResolutionId: String # contents > epsd_rslu_info (rslu_typ_cd 기준 화질 HD > UHD > HDR > SD 우선 순위 내림차순 정렬 후 가장 첫번째 인덱스 데이터 값 사용)
+    startTime: Int # epsd_rslu_info > openg_tmtag_tmsc
+    previewTime: Int # epsd_rslu_info > preview_time
+    totalTime: Int # contents > play_time
+}
+
+type TrailerPlay {
+    episodeId: String
+    seriesId: String
+    productPriceId: String # preview 필드의 첫번째 인덱스 데이터 > prd_prc_id
+}

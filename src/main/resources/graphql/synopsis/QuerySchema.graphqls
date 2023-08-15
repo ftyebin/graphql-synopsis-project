@@ -1,4 +1,6 @@
 type Query {
+    viewPage (requestData: RequestData): ViewPage,
+
     synopsisPage (requestData: RequestData): SynopsisView,
 
     getEuxpResult(
@@ -26,7 +28,7 @@ type Query {
 }
 
 type SynopsisView {
-    euxpResult: EuxpResult,
-    smdResult: SmdResult,
+    euxpResult: EuxpResult
+    smdResult: SmdResult
     scsResult: ScsResult
 }
