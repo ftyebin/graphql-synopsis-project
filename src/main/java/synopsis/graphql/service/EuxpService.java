@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import synopsis.graphql.config.EuxpConfig;
 import synopsis.graphql.model.dto.request.RequestEuxpData;
-import synopsis.graphql.model.exup.EuxpResult;
+import synopsis.graphql.model.euxp.EuxpResult;
 import synopsis.graphql.util.converter.EuxpJsonToObjectConverter;
 
 @RequiredArgsConstructor

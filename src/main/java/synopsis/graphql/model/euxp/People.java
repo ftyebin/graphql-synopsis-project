@@ -1,4 +1,4 @@
-package synopsis.graphql.model.exup;
+package synopsis.graphql.model.euxp;
 
 public class People {
     public String prs_id;

@@ -26,12 +26,10 @@ public class SynopsisController {
     public SynopsisData synopsisPage(@Argument RequestData requestData) {
 
         RequestEuxpData requestEuxpData = new RequestEuxpData(requestData);
-        RequestSmdData requestSmdData = new RequestSmdData(requestData);
         RequestScsData requestScsData = new RequestScsData(requestData);
 
         return SynopsisData.builder()
                 .euxpResult(euxpService.getEuxpResult(requestEuxpData))
-                .smdResult(smdService.getSmdResult(requestSmdData))
                 .scsResult(scsService.getScsResult(requestScsData))
             .build();
     }

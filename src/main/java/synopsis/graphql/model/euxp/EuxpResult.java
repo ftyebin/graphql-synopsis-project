@@ -1,6 +1,5 @@
-package synopsis.graphql.model.exup;
+package synopsis.graphql.model.euxp;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -16,7 +15,6 @@ public class EuxpResult {
     public List<Object> series;
     public int total_banner_count;
     public String response_time;
-    @JsonProperty("IF")
-    public String iF;
+    public String IF;
     public List<Object> banners;
 }

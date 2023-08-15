@@ -1,6 +1,7 @@
-package synopsis.graphql.model.exup;
+package synopsis.graphql.model.euxp;
 
-import java.util.ArrayList;
+
+import java.util.List;
 
 public class Purchare {
     public String prd_typ_cd;
@@ -38,7 +39,7 @@ public class Purchare {
     public String ppm_prd_nm;
     public String ppm_prd_typ_cd;
     public String sale_tgt_fg_yn;
-    public ArrayList<Object> poc_det_typ_cd_list;
+    public List<Object> poc_det_typ_cd_list;
     public String ppm_free_join_yn;
     public String ppm_free_join_perd_cd;
 }

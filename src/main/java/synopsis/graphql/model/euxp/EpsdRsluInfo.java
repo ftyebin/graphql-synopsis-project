@@ -1,6 +1,6 @@
-package synopsis.graphql.model.exup;
+package synopsis.graphql.model.euxp;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class EpsdRsluInfo{
     public String epsd_rslu_id;
@@ -23,5 +23,5 @@ public class EpsdRsluInfo{
     public double endg_tmtag_tmsc;
     public String prd_prc_fr_dt;
     public String prd_prc_to_dt;
-    public ArrayList<Object> capt_lans;
+    public List<Object> capt_lans;
 }

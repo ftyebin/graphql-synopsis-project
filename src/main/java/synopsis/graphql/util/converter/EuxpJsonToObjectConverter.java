@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import synopsis.graphql.model.exup.EuxpResult;
+import synopsis.graphql.model.euxp.EuxpResult;
 
 @Slf4j
 public

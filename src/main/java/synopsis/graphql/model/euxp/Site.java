@@ -1,6 +1,6 @@
-package synopsis.graphql.model.exup;
+package synopsis.graphql.model.euxp;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Site {
     public String site_cd;
@@ -8,6 +8,6 @@ public class Site {
     public int bas_pnt;
     public double avg_pnt;
     public int review_cnt;
-    public ArrayList<Object> reviews;
-    public ArrayList<DistInfo> dist_info;
+    public List<Object> reviews;
+    public List<DistInfo> dist_info;
 }

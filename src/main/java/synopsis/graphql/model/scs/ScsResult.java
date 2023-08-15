@@ -1,14 +1,12 @@
 package synopsis.graphql.model.scs;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class ScsResult {
-    @JsonProperty("IF")
-    public String iF;
+    public String IF;
     public String ver;
     public String ui_name;
     public String svc_name;

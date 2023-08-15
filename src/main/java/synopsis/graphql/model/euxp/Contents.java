@@ -1,6 +1,6 @@
-package synopsis.graphql.model.exup;
+package synopsis.graphql.model.euxp;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Contents {
     public String sris_id;
@@ -31,7 +31,7 @@ public class Contents {
     public String chrtr_ai_typ_cd;
     public String sris_poster_filename_v;
     public String sris_poster_filename_h;
-    public ArrayList<PossBgImg> poss_bg_img;
+    public List<PossBgImg> poss_bg_img;
     public String aprc_pt_cts;
     public String aprc_pt_cts_colr_val;
     public String open_yr;
@@ -41,8 +41,8 @@ public class Contents {
     public String lag_capt_typ_exps_yn;
     public String brcast_avl_perd_yn;
     public Object series_info;
-    public ArrayList<Preview> preview;
-    public ArrayList<Object> special;
+    public List<Preview> preview;
+    public List<Object> special;
     public String sris_sales_comt_title;
     public String sris_sales_comt_cts;
     public String sris_sales_comt_exps_mthd_cd;
@@ -81,7 +81,7 @@ public class Contents {
     public String mob_sris_evt_comt_call_typ_cd;
     public String mob_sris_evt_comt_call_url;
     public String mob_sris_evt_comt_call_objt_id;
-    public ArrayList<Genre> genres;
+    public List<Genre> genres;
     public String epsd_id;
     public String orgn_epsd_id;
     public String brcast_tseq_nm;
@@ -100,7 +100,7 @@ public class Contents {
     public String cacbro_yn;
     public String cacbro_cd;
     public String cacbro_cts;
-    public ArrayList<StillCut> stillCut;
+    public List<StillCut> stillCut;
     public String mob_mda_capt_yn;
     public String mob_mda_file_path;
     public String seeking_img_path;
@@ -145,11 +145,11 @@ public class Contents {
     public String mob_epsd_evt_comt_call_objt_id;
     public String pre_exam_yn;
     public String trailer_view_yn;
-    public ArrayList<Object> products;
-    public ArrayList<Object> ai_inside_scenes;
-    public ArrayList<Object> all_ai_inside_scenes;
-    public ArrayList<EpsdRsluInfo> epsd_rslu_info;
-    public ArrayList<People> peoples;
+    public List<Object> products;
+    public List<Object> ai_inside_scenes;
+    public List<Object> all_ai_inside_scenes;
+    public List<EpsdRsluInfo> epsd_rslu_info;
+    public List<People> peoples;
     public String snd_typ_cd;
     public String play_tms_val;
     public String play_time;
@@ -193,6 +193,10 @@ public class Contents {
     public String pcim_lvl7_wat_age_cd;
     public String wat_lvl_phrs;
     public String manufco_nm;
-    public ArrayList<Object> otts;
+    public String ai_rank;
+    public String ai_scene;
+    public String ai_preview_comt;
+    public String ai_prize_yn;
+    public List<Object> otts;
     public String audio_lag_typ_cd;
 }
