@@ -25,7 +25,6 @@ public class EuxpService {
         HttpHeaders headers = new HttpHeaders();
         euxpConfig.getHeaders().forEach(headers::set);
 
-        log.info(requestEuxpData.getMenuStbServiceId());
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(euxpConfig.getUrl())
                 .queryParam("stb_id", requestEuxpData.getStbId())
@@ -36,7 +35,6 @@ public class EuxpService {
 
         euxpConfig.getParams().forEach(uriComponentsBuilder::queryParam);
 
-        log.info(uriComponentsBuilder.build().getQuery());
         String url = uriComponentsBuilder.toUriString();
 
         HttpEntity<Object> entity = new HttpEntity<>(headers);

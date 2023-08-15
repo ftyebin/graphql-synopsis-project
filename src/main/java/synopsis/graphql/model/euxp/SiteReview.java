@@ -7,5 +7,5 @@ public class SiteReview {
     public TmdbPntInfo tmdb_pnt_info;
     public List<Site> sites;
     public List<BtvPntInfo> btv_pnt_info;
-    public List<Object> prize_history;
+    public List<PrizeHistory> prize_history;
 }

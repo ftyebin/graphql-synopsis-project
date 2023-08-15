@@ -2,13 +2,11 @@ package synopsis.graphql.model.dto.request;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.ToString;
 
 import java.util.List;
 
 @Data
 @Builder
-@ToString
 public class CustomScsRequestBody {
     private String response_format;
     private String ver;

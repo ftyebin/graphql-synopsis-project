@@ -18,10 +18,8 @@ class EuxpJsonToObjectConverter {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            EuxpResult euxpResult = objectMapper.readValue(jsonData, EuxpResult.class);
 
-            log.info("euxpResult = " + euxpResult);
-            return euxpResult;
+            return objectMapper.readValue(jsonData, EuxpResult.class);
 
         } catch (JsonMappingException e) {
             e.printStackTrace();

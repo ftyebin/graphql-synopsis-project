@@ -34,7 +34,6 @@ public class ScsService {
     private final RestTemplate restTemplate;
 
     private CustomScsPpvProducts setCustomPpvProducts(RequestScsPpvProduct product) {
-        log.info(product.toString());
         return CustomScsPpvProducts.builder()
                 .prd_prc_id(product.getProductPriceId())
                 .yn_prd_nscreen(product.getIsNScreen())
