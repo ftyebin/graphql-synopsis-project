@@ -1,12 +1,19 @@
 type ViewPage {
+    # type: SynopsisType
     # banners: SynopsisBanner
     title: ContentsTitle
+    # comment: ContentsComment
     details: ContentsDetail
     contentsAdditional: ContentsAdditional
     # userPreference: UserContentsPreference
-    # episodeList: ContentsEpisodeList
+    episodeList: ContentsEpisodeList
     # purchaseInfo: PurchaseInfo
     playInfo: PlayInfo
+}
+
+enum SynopsisType {
+    SHORTS
+    SEASON
 }
 
 type SynopsisBanner {
