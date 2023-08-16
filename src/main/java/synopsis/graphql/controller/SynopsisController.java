@@ -10,10 +10,7 @@ import synopsis.graphql.model.dto.request.RequestScsData;
 import synopsis.graphql.model.dto.request.RequestSmdData;
 import synopsis.graphql.model.dto.response.SynopsisData;
 import synopsis.graphql.model.viewpage.ViewPage;
-import synopsis.graphql.service.EuxpService;
-import synopsis.graphql.service.ScsService;
-import synopsis.graphql.service.SmdService;
-import synopsis.graphql.service.ViewPageService;
+import synopsis.graphql.service.*;
 
 
 @Controller
@@ -25,9 +22,8 @@ public class SynopsisController {
     private final ScsService scsService;
     private final ViewPageService viewPageService;
 
-
     @QueryMapping
-    public SynopsisData synopsisPage(@Argument RequestData requestData) {
+    public SynopsisData synopsisView(@Argument RequestData requestData) {
 
         RequestEuxpData requestEuxpData = new RequestEuxpData(requestData);
         RequestSmdData requestSmdData = new RequestSmdData(requestData);
@@ -41,9 +37,7 @@ public class SynopsisController {
     }
 
     @QueryMapping
-    public ViewPage viewPage(@Argument RequestData requestData) {
-        RequestEuxpData requestEuxpData = new RequestEuxpData(requestData);
-
-        return viewPageService.getViewPageResult(requestEuxpData);
+    public ViewPage synopsisPage(@Argument RequestData requestData) {
+        return viewPageService.getViewPageResult(requestData);
     }
 }

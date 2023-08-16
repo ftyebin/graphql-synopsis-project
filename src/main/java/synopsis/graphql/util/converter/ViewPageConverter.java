@@ -1,8 +1,11 @@
 package synopsis.graphql.util.converter;
 
+import synopsis.graphql.model.dto.response.SynopsisData;
 import synopsis.graphql.model.euxp.Contents;
 import synopsis.graphql.model.euxp.EpsdRsluInfo;
 import synopsis.graphql.model.euxp.EuxpResult;
+import synopsis.graphql.model.scs.ScsResult;
+import synopsis.graphql.model.smd.SmdResult;
 import synopsis.graphql.model.viewpage.*;
 
 import java.util.ArrayList;
@@ -20,53 +23,34 @@ public class ViewPageConverter {
         throw new IllegalStateException("View Page Converter");
     }
 
-    public static ViewPage convert(String jsonData) {
-        EuxpResult euxpResult = EuxpJsonToObjectConverter.convert(jsonData);
+    public static ViewPage convert(SynopsisData synopsisData) {
+
+        EuxpResult euxpResult = synopsisData.getEuxpResult();
+        SmdResult smdResult = synopsisData.getSmdResult();
+        ScsResult scsResult = synopsisData.getScsResult();
+
+
+        // Todo: SynopsisType type = getSynopsisType(euxpContents);
+        // Todo: SynopsisBanner banners = getSynopsisBanner(euxpContents);
 
         Contents euxpContents = Objects.requireNonNull(euxpResult).getContents();
-
-        /*
-          Contents Title
-         */
         ContentsTitle title = getContentsTitle(euxpContents);
-
-
-        /*
-          ContentsDetail
-         */
         ContentsDetail contentsDetail = getContentsDetail(euxpContents);
-
-
-        /*
-          Contents Additional
-         */
         ContentsAdditional contentsAdditional = getContentsAdditional(euxpContents);
 
-        /*
-            UserContentsPreference
-         */
+        // Todo: UserContentsPreference userPreference = getUserContentsPreference(euxpContents);
 
+        ContentsEpisodeList episodeList = getContentsEpisodeList(euxpContents);
 
-        /*
-            ContentsEpisodeList
-         */
-        getContentsEpisodeList(euxpContents);
+        // Todo: PurchaseInfo purchaseInfo = getPurchaseInfo(euxpContents);
 
-        /*
-            PurchaseInfo
-         */
-
-
-        /*
-            PlayInfo
-         */
         PlayInfo playInfo = getPlayInfo(euxpContents);
-
 
         return ViewPage.builder()
                 .title(title)
                 .details(contentsDetail)
                 .contentsAdditional(contentsAdditional)
+                .episodeList(episodeList)
                 .playInfo(playInfo)
             .build();
     }
@@ -96,7 +80,7 @@ public class ViewPageConverter {
             .build();
     }
 
-    private static void getContentsEpisodeList(Contents euxpContents) {
+    private static ContentsEpisodeList getContentsEpisodeList(Contents euxpContents) {
         ContentsEpisode contentsEpisode = ContentsEpisode.builder()
                 .imagePath(euxpContents.epsd_poster_filename_h)
                 .episodeNumber(euxpContents.brcast_tseq_nm)
@@ -106,9 +90,9 @@ public class ViewPageConverter {
                 )
             .build();
 
-        ContentsEpisodeList.builder()
+        return ContentsEpisodeList.builder()
                 .list(Collections.singletonList(contentsEpisode))
-            .build();
+                .build();
     }
 
     private static ContentsAdditional getContentsAdditional(Contents euxpContents) {

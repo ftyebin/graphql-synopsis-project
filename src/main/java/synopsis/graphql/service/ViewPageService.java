@@ -1,52 +1,34 @@
 package synopsis.graphql.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-import synopsis.graphql.config.EuxpConfig;
+import synopsis.graphql.model.dto.request.RequestData;
 import synopsis.graphql.model.dto.request.RequestEuxpData;
+import synopsis.graphql.model.dto.request.RequestScsData;
+import synopsis.graphql.model.dto.request.RequestSmdData;
+import synopsis.graphql.model.dto.response.SynopsisData;
 import synopsis.graphql.model.viewpage.ViewPage;
 import synopsis.graphql.util.converter.ViewPageConverter;
 
 @RequiredArgsConstructor
-@Slf4j
 @Service
 public class ViewPageService {
-    private final RestTemplate restTemplate;
-    private final EuxpConfig euxpConfig;
+    private final EuxpService euxpService;
+    private final SmdService smdService;
+    private final ScsService scsService;
 
-    public ViewPage getViewPageResult(RequestEuxpData requestEuxpData) {
 
-        HttpHeaders headers = new HttpHeaders();
-        euxpConfig.getHeaders().forEach(headers::set);
+    public ViewPage getViewPageResult(RequestData requestData) {
+        RequestEuxpData requestEuxpData = new RequestEuxpData(requestData);
+        RequestSmdData requestSmdData = new RequestSmdData(requestData);
+        RequestScsData requestScsData = new RequestScsData(requestData);
 
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(euxpConfig.getUrl())
-                .queryParam("stb_id", requestEuxpData.getStbId())
-                .queryParam("search_type", requestEuxpData.getSynopsisSearchType())
-                .queryParam("yn_recent", requestEuxpData.getLookupType())
-                .queryParam("menu_stb_svc_id", requestEuxpData.getMenuStbServiceId())
-                .queryParam("epsd_id", requestEuxpData.getEpisodeId());
+        SynopsisData synopsisData = SynopsisData.builder()
+                .euxpResult(euxpService.getEuxpResult(requestEuxpData))
+                .smdResult(smdService.getSmdResult(requestSmdData))
+                .scsResult(scsService.getScsResult(requestScsData))
+            .build();
 
-        euxpConfig.getParams().forEach(uriComponentsBuilder::queryParam);
-
-        String url = uriComponentsBuilder.toUriString();
-
-        HttpEntity<Object> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
-
-        log.info(response.getBody());
-
-        return ViewPageConverter.convert(response.getBody());
+        return ViewPageConverter.convert(synopsisData);
     }
 }

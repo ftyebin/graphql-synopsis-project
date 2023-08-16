@@ -6,11 +6,14 @@ import lombok.Data;
 @Data
 @Builder
 public class ViewPage {
+    // private SynopsisType type;
+    // private SynopsisBanner banners;
     private ContentsTitle title;
+    // private ContentsComment comment;
     private ContentsDetail details;
     private ContentsAdditional contentsAdditional;
     private UserContentsPreference userPreference;
     private ContentsEpisodeList episodeList;
+    // private PurchaseInfo purchaseInfo;
     private PlayInfo playInfo;
-
 }

@@ -46,6 +46,11 @@ public class ScsService {
     }
 
     public ScsResult getScsResult(RequestScsData requestScsData){
+        ResponseEntity<String> response = getScsResponse(requestScsData);
+        return ScsJsonToObjectConverter.convert(response.getBody());
+    }
+
+    public ResponseEntity<String> getScsResponse(RequestScsData requestScsData) {
         List<CustomScsPpvProducts> customScsPpvProducts = new ArrayList<>();
 
         HttpHeaders headers = new HttpHeaders();
@@ -66,15 +71,11 @@ public class ScsService {
                 .ppv_products(customScsPpvProducts)
             .build();
 
-        ResponseEntity<String> response = restTemplate.exchange(
+        return restTemplate.exchange(
                 scsConfig.getUrl(),
                 HttpMethod.POST,
                 new HttpEntity<>(scsRequestBody, headers),
                 String.class
         );
-
-        log.info(response.getBody());
-
-        return ScsJsonToObjectConverter.convert(response.getBody());
     }
 }
