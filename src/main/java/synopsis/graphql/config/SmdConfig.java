@@ -1,17 +1,13 @@
 package synopsis.graphql.config;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
-@Getter
-@Setter
-@RequiredArgsConstructor
+@Data
 @ConfigurationProperties(prefix = "smd")
 public class SmdConfig {
     private String url;

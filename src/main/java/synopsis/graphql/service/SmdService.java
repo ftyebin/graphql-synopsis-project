@@ -22,6 +22,12 @@ public class SmdService {
     private final RestTemplate restTemplate;
 
     public SmdResult getSmdResult(RequestSmdData requestSmdData){
+
+        ResponseEntity<String> response = getSmdResponse(requestSmdData);
+        return SmdJsonToObjectConverter.convert(response.getBody());
+    }
+
+    public ResponseEntity<String> getSmdResponse(RequestSmdData requestSmdData) {
         HttpHeaders headers = new HttpHeaders();
         smdConfig.getHeaders().forEach(headers::set);
 
@@ -34,11 +40,9 @@ public class SmdService {
         String url = uriComponentsBuilder.toUriString();
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(url,
+        return restTemplate.exchange(url,
                 HttpMethod.GET,
                 entity,
                 String.class);
-
-        return SmdJsonToObjectConverter.convert(response.getBody());
     }
 }

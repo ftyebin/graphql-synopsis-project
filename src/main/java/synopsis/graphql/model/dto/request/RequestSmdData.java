@@ -8,8 +8,6 @@ public class RequestSmdData {
     private String stbId;
     private String seriesId;
 
-    public RequestSmdData() {}
-
     public RequestSmdData(RequestData requestData) {
         this.mac = requestData.getMac();
         this.stbId = requestData.getStbId();

@@ -11,8 +11,6 @@ public class RequestEuxpData {
     private String menuStbServiceId;
     private String episodeId;
 
-    public RequestEuxpData() { }
-
     public RequestEuxpData(RequestData requestData){
         this.stbId =  requestData.getStbId();
         this.synopsisSearchType = requestData.getSynopsisSearchType();

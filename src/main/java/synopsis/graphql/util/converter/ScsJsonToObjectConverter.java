@@ -17,11 +17,7 @@ class ScsJsonToObjectConverter {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            ScsResult scsResult = objectMapper.readValue(jsonData, ScsResult.class);
-
-            log.info("scsResult = " + scsResult);
-            return scsResult;
-
+            return objectMapper.readValue(jsonData, ScsResult.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

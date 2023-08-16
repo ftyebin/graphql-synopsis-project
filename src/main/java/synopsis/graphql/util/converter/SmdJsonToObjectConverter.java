@@ -18,10 +18,7 @@ class SmdJsonToObjectConverter {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            SmdResult smdResult = objectMapper.readValue(jsonData, SmdResult.class);
-
-            log.info("scsResult = " + smdResult);
-            return smdResult;
+            return objectMapper.readValue(jsonData, SmdResult.class);
 
         } catch (JsonMappingException e) {
             e.printStackTrace();

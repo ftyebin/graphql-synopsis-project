@@ -22,10 +22,13 @@ public class EuxpService {
     private final EuxpConfig euxpConfig;
 
     public EuxpResult getEuxpResult(RequestEuxpData requestEuxpData) {
+        ResponseEntity<String> response = getEuxpResponse(requestEuxpData);
+        return EuxpJsonToObjectConverter.convert(response.getBody());
+    }
+
+    public ResponseEntity<String> getEuxpResponse(RequestEuxpData requestEuxpData) {
         HttpHeaders headers = new HttpHeaders();
         euxpConfig.getHeaders().forEach(headers::set);
-
-        log.info(requestEuxpData.getMenuStbServiceId());
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(euxpConfig.getUrl())
                 .queryParam("stb_id", requestEuxpData.getStbId())
@@ -36,19 +39,15 @@ public class EuxpService {
 
         euxpConfig.getParams().forEach(uriComponentsBuilder::queryParam);
 
-        log.info(uriComponentsBuilder.build().getQuery());
         String url = uriComponentsBuilder.toUriString();
 
         HttpEntity<Object> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(
+
+        return restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 entity,
                 String.class
         );
-
-        log.info(response.getBody());
-
-        return EuxpJsonToObjectConverter.convert(response.getBody());
     }
 }
