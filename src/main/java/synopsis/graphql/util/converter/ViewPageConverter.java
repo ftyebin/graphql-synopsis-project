@@ -4,6 +4,7 @@ import synopsis.graphql.model.dto.response.SynopsisData;
 import synopsis.graphql.model.euxp.Contents;
 import synopsis.graphql.model.euxp.EpsdRsluInfo;
 import synopsis.graphql.model.euxp.EuxpResult;
+import synopsis.graphql.model.euxp.Purchare;
 import synopsis.graphql.model.scs.ScsResult;
 import synopsis.graphql.model.smd.SmdResult;
 import synopsis.graphql.model.viewpage.*;
@@ -43,7 +44,7 @@ public class ViewPageConverter {
 
         ContentsEpisodeList episodeList = getContentsEpisodeList(euxpContents);
 
-        // Todo: PurchaseInfo purchaseInfo = getPurchaseInfo(euxpContents);
+        PurchaseInfo purchaseInfo = getPurchaseInfo(euxpResult);
 
         PlayInfo playInfo = getPlayInfo(euxpContents);
 
@@ -53,8 +54,40 @@ public class ViewPageConverter {
                 .contentsAdditional(contentsAdditional)
                 .userPreference(userPreference)
                 .episodeList(episodeList)
+                .purchaseInfo(purchaseInfo)
                 .playInfo(playInfo)
             .build();
+    }
+
+    private static PurchaseInfo getPurchaseInfo(EuxpResult euxpResult) {
+
+        List<Purchare> purchares = euxpResult.getPurchares();
+        ArrayList<Product> products = new ArrayList<>();
+
+        purchares.forEach(purchare -> products.add(Product.builder()
+                .productTypeCode(purchare.prd_typ_cd)
+                .episodeId(purchare.epsd_id)
+                .episodeResolutionId(purchare.epsd_rslu_id)
+                .discountTypeCode(purchare.dsc_typ_cd)
+                .languageCaptionTypeCode(purchare.lag_capt_typ_cd)
+                .isNscreen(purchare.nscrn_yn.equals(YES))
+                .isPossession(purchare.possn_yn.equals(YES))
+                .isPpmFreeJoin(purchare.ppm_free_join_yn.equals(YES))
+                .ppmGridIconImagePath(purchare.ppm_grid_icon_img_path)
+                .ppmProductName(purchare.ppm_prd_nm)
+                .productPriceId(purchare.prd_prc_id)
+                .productPriceVat((int) purchare.prd_prc_vat)
+                .salePrice((int) purchare.sale_prc)
+                .salePriceVat((int) purchare.sale_prc_vat)
+                .purchasePreferenceRank(purchare.purc_pref_rank)
+                .purchasedWatchedCount(purchare.purc_wat_dd_cnt + purchare.purc_wat_dd_fg_cd)
+                .resolutionTypeCode(purchare.rslu_typ_cd)
+                .isUsed(purchare.use_yn.equals(YES))
+                .isReservation(euxpResult.getContents().rsv_orgnz_yn.equals(YES))
+            .build()
+        ));
+
+        return PurchaseInfo.builder().products(products).build();
     }
 
     private static UserContentsPreference getUserContentsPreference(SmdResult smdResult, ScsResult scsResult) {

@@ -7,7 +7,7 @@ type ViewPage {
     contentsAdditional: ContentsAdditional
     userPreference: UserContentsPreference
     episodeList: ContentsEpisodeList
-    # purchaseInfo: PurchaseInfo
+    purchaseInfo: PurchaseInfo
     playInfo: PlayInfo
 }
 
@@ -153,12 +153,10 @@ type ContentsEpisode {
 }
 
 type PurchaseInfo {
-    freeProducts: [FreeProduct]
-    purchasedProducts: [PurchasedProduct]
-    purchasableProducts: [PurchasableProduct]
+    products: [Product]
 }
 
-interface Product {
+type Product {
     productTypeCode: String # prd_typ_cd
     episodeId: String # epsd_id
     episodeResolutionId: String # epsd_rslu_id
@@ -173,91 +171,43 @@ interface Product {
     productPriceVat: Int # prd_prc_vat
     salePrice: Int # sale_prc
     salePriceVat: Int # sale_prc_vat
-    # purchares > purc_wat_dd_cnt + purc_wat_dd_fg_cd 두 필드 합쳐서 문자열 형태로 전달
     purchasePreferenceRank: String
-    purchasedWatchedCount: String
-    resolutionTypeCode: String # purchares > rslu_typ_cd
+    # purchares > purc_wat_dd_cnt + purc_wat_dd_fg_cd 두 필드 합쳐서 문자열 형태로 전달
+    purchasedWatchedCount: String # purchares > rslu_typ_cd
     isUsed: Boolean # purchares > use_yn
     isReservation: Boolean # rsv_orgnz_yn
 }
-
-type FreeProduct implements Product {
-    productTypeCode: String # prd_typ_cd
-    episodeId: String # epsd_id
-    episodeResolutionId: String # epsd_rslu_id
-    discountTypeCode: String # dsc_typ_cd
-    languageCaptionTypeCode: String # lag_capt_typ_cd
-    isNscreen: Boolean # nscrn_yn
-    isPossession: Boolean # possn_yn
-    isPpmFreeJoin: Boolean # ppm_free_join_yn
-    ppmGridIconImagePath: String # ppm_grid_icon_img_path
-    ppmProductName: String # ppm_prd_nm
-    productPriceId: String # prd_prc_id
-    productPriceVat: Int # prd_prc_vat
-    salePrice: Int # sale_prc
-    salePriceVat: Int # sale_prc_vat
-    # purchares > purc_wat_dd_cnt + purc_wat_dd_fg_cd 두 필드 합쳐서 문자열 형태로 전달
-    purchasePreferenceRank: String
-    purchasedWatchedCount: String
-    resolutionTypeCode: String # purchares > rslu_typ_cd
-    isUsed: Boolean # purchares > use_yn
-    isReservation: Boolean # rsv_orgnz_yn
-
-}
-
-type PurchasedProduct implements Product {
-    productTypeCode: String # prd_typ_cd
-    episodeId: String # epsd_id
-    episodeResolutionId: String # epsd_rslu_id
-    discountTypeCode: String # dsc_typ_cd
-    languageCaptionTypeCode: String # lag_capt_typ_cd
-    isNscreen: Boolean # nscrn_yn
-    isPossession: Boolean # possn_yn
-    isPpmFreeJoin: Boolean # ppm_free_join_yn
-    ppmGridIconImagePath: String # ppm_grid_icon_img_path
-    ppmProductName: String # ppm_prd_nm
-    productPriceId: String # prd_prc_id
-    productPriceVat: Int # prd_prc_vat
-    salePrice: Int # sale_prc
-    salePriceVat: Int # sale_prc_vat
-    # purchares > purc_wat_dd_cnt + purc_wat_dd_fg_cd 두 필드 합쳐서 문자열 형태로 전달
-    purchasePreferenceRank: String
-    purchasedWatchedCount: String
-    resolutionTypeCode: String # purchares > rslu_typ_cd
-    isUsed: Boolean # purchares > use_yn
-    isReservation: Boolean # rsv_orgnz_yn
-}
-
-type PurchasableProduct implements Product {
-    productTypeCode: String # prd_typ_cd
-    episodeId: String # epsd_id
-    episodeResolutionId: String # epsd_rslu_id
-    discountTypeCode: String # dsc_typ_cd
-    languageCaptionTypeCode: String # lag_capt_typ_cd
-    isNscreen: Boolean # nscrn_yn
-    isPossession: Boolean # possn_yn
-    isPpmFreeJoin: Boolean # ppm_free_join_yn
-    ppmGridIconImagePath: String # ppm_grid_icon_img_path
-    ppmProductName: String # ppm_prd_nm
-    productPriceId: String # prd_prc_id
-    productPriceVat: Int # prd_prc_vat
-    salePrice: Int # sale_prc
-    salePriceVat: Int # sale_prc_vat
-    # purchares > purc_wat_dd_cnt + purc_wat_dd_fg_cd 두 필드 합쳐서 문자열 형태로 전달
-    purchasePreferenceRank: String
-    purchasedWatchedCount: String
-    resolutionTypeCode: String # purchares > rslu_typ_cd
-    isUsed: Boolean # purchares > use_yn
-    isReservation: Boolean # rsv_orgnz_yn
-}
-
 
 type PlayInfo {
     mainPreviewPlay: MainPreviewPlay
-    # aiHighlightPlay: AIHighlightPlay
+    aiHighlightPlay: AIHighlightPlay
     trailerPlay: TrailerPlay
-    # cornerPlays: [CornerPlay]
-    # specialPlays: [SpecialPlay]
+    cornerPlays: [CornerPlay]
+    specialPlays: [SpecialPlay]
+}
+
+type AIHighlightPlay {
+    episodeId: String
+    seriesId: String
+    startTime: Int
+    previewTime: Int
+}
+
+type CornerPlay {
+    cornerBottomName: String
+    cornerGroupName: String
+    cornerId: String
+    cornerName: String
+    episodeResolutionId: String
+    imagePath: String
+}
+
+type SpecialPlay {
+    episodeId: String
+    episodeResolutionId: String
+    imagePath: String
+    productPriceId: String
+    title: String
 }
 
 type MainPreviewPlay {

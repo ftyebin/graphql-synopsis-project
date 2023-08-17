@@ -14,6 +14,6 @@ public class ViewPage {
     private ContentsAdditional contentsAdditional;
     private UserContentsPreference userPreference;
     private ContentsEpisodeList episodeList;
-    // private PurchaseInfo purchaseInfo;
+    private PurchaseInfo purchaseInfo;
     private PlayInfo playInfo;
 }
