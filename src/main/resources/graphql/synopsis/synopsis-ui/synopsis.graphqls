@@ -120,10 +120,13 @@ type Prize {
 }
 
 type ContentsAdditional {
-    stillCut: [StillCut]
+    stillCut: [stillCut]
     similarContents: SimilarContents
 }
 
+type stillCut {
+    imagePath: String
+}
 type SimilarContents {
     callId: String # cw_call_id_val
 }

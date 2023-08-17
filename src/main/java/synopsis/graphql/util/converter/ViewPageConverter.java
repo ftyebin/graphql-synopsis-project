@@ -1,24 +1,23 @@
 package synopsis.graphql.util.converter;
 
+import lombok.extern.slf4j.Slf4j;
 import synopsis.graphql.model.dto.response.SynopsisData;
-import synopsis.graphql.model.euxp.Contents;
-import synopsis.graphql.model.euxp.EpsdRsluInfo;
-import synopsis.graphql.model.euxp.EuxpResult;
-import synopsis.graphql.model.euxp.Purchare;
+import synopsis.graphql.model.euxp.*;
 import synopsis.graphql.model.scs.ScsResult;
 import synopsis.graphql.model.smd.SmdResult;
 import synopsis.graphql.model.viewpage.*;
+import synopsis.graphql.model.viewpage.StillCut;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Slf4j
 public class ViewPageConverter {
 
     private static final String YES = "Y";
     private static final String LIKE_INFO_CHOSEN = "1";
     private static final int FIRST_INDEX = 0;
+    private static final Integer PREVIEW_TIME_FIXED = 180;
 
 
     private ViewPageConverter(){
@@ -108,26 +107,75 @@ public class ViewPageConverter {
 
 
     private static PlayInfo getPlayInfo(Contents euxpContents) {
-        EpsdRsluInfo epsdRsluInfo = euxpContents.epsd_rslu_info.get(FIRST_INDEX); // rslu_typ_cd 기준 정렬 필요 (임시- 첫번째 인덱스)
+        List<EpsdRsluInfo> sortedEpsdRsluInfo = euxpContents.epsd_rslu_info.stream()
+                .sorted(Comparator.comparing(e -> e.rslu_typ_cd))
+                .toList();
+        EpsdRsluInfo epsdRsluInfo = sortedEpsdRsluInfo.get(FIRST_INDEX);
+
+        MainPreviewPlay mainPreviewPlay = MainPreviewPlay.builder()
+                .episodeId(euxpContents.epsd_id)
+                .seriesId(euxpContents.sris_id)
+                .episodeResolutionId(epsdRsluInfo.epsd_rslu_id)
+                .startTime((int) epsdRsluInfo.openg_tmtag_tmsc)
+                .previewTime(Integer.parseInt(epsdRsluInfo.preview_time))
+                .totalTime(Integer.parseInt(euxpContents.play_time))
+            .build();
+
+        TrailerPlay trailerPlay = TrailerPlay.builder()
+                .episodeId(euxpContents.epsd_id)
+                .seriesId(euxpContents.sris_id)
+                .productPriceId(euxpContents.preview.get(FIRST_INDEX).prd_prc_id)
+            .build();
+
+        AIHighlightPlay aiHighlightPlay;
+        if (euxpContents.ai_inside_scenes.isEmpty()) {
+            aiHighlightPlay = null;
+        } else {
+            aiHighlightPlay = AIHighlightPlay.builder()
+                    .episodeId(euxpContents.epsd_id)
+                    .seriesId(euxpContents.sris_id)
+                    .startTime(Integer.valueOf(euxpContents.ai_inside_scenes.get(FIRST_INDEX).tmtag_fr_tmsc))
+                    .previewTime(PREVIEW_TIME_FIXED)
+                .build();
+        }
+        var corners = euxpContents.corners;
+        List<CornerPlay> cornerPlays = Collections.emptyList();
+        if (corners != null) {
+            if (!euxpContents.corners.isEmpty()) {
+                cornerPlays = euxpContents.corners.stream()
+                        .map(corner ->
+                                CornerPlay.builder()
+                                        .cornerBottomName(corner.cnr_btm_nm)
+                                        .cornerGroupName(corner.cnr_grp_id)
+                                        .cornerId(corner.cnr_id)
+                                        .cornerName(corner.cnr_nm)
+                                        .episodeResolutionId(corner.epsd_rslu_id)
+                                        .imagePath(corner.img_path)
+                                        .build())
+                        .collect(Collectors.toCollection(ArrayList::new));
+            }
+        }
+
+        List<SpecialPlay> specialPlays = Collections.emptyList();
+        if (!euxpContents.special.isEmpty()) {
+            specialPlays = euxpContents.special.stream()
+                    .map(special ->
+                            SpecialPlay.builder()
+                                    .episodeResolutionId(special.epsd_rslu_id)
+                                    .imagePath(special.img_path)
+                                    .productPriceId(special.prd_prc_id)
+                                    .title(special.title)
+                                    .build())
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
+
 
         return PlayInfo.builder()
-                .mainPreviewPlay(
-                        MainPreviewPlay.builder()
-                                .episodeId(euxpContents.epsd_id)
-                                .seriesId(euxpContents.sris_id)
-                                .episodeResolutionId(epsdRsluInfo.epsd_rslu_id)
-                                .startTime((int) epsdRsluInfo.openg_tmtag_tmsc)
-                                .previewTime(Integer.parseInt(epsdRsluInfo.preview_time))
-                                .totalTime(Integer.parseInt(euxpContents.play_time))
-                            .build()
-                )
-                .trailerPlay(
-                        TrailerPlay.builder()
-                                .episodeId(euxpContents.epsd_id)
-                                .seriesId(euxpContents.sris_id)
-                                .productPriceId(euxpContents.preview.get(FIRST_INDEX).prd_prc_id)
-                            .build()
-                )
+                .mainPreviewPlay(mainPreviewPlay)
+                .trailerPlay(trailerPlay)
+                .aiHighlightPlay(aiHighlightPlay)
+                .cornerPlays(cornerPlays)
+                .specialPlays(specialPlays)
             .build();
     }
 
@@ -147,11 +195,11 @@ public class ViewPageConverter {
     }
 
     private static ContentsAdditional getContentsAdditional(Contents euxpContents) {
+        ArrayList<StillCut> stillCuts = new ArrayList<>();
+        euxpContents.stillCut.forEach(still -> stillCuts.add(StillCut.builder().imagePath(still.img_path).build()));
+
         return ContentsAdditional.builder()
-                .stillCut(euxpContents.stillCut.stream()
-                        .map(cut -> StillCut.builder().imagePath(cut.img_path).build())
-                        .toList()
-                )
+                .stillCut(stillCuts)
                 .similarContents(SimilarContents.builder().callId(euxpContents.cw_call_id_val).build())
             .build();
     }
