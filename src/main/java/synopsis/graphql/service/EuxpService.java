@@ -7,9 +7,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import synopsis.graphql.config.EuxpConfig;
+import synopsis.graphql.excpetion.EuxpRequestException;
 import synopsis.graphql.model.dto.request.RequestEuxpData;
 import synopsis.graphql.model.euxp.EuxpResult;
 import synopsis.graphql.util.converter.EuxpJsonToObjectConverter;
@@ -43,11 +45,11 @@ public class EuxpService {
 
         HttpEntity<Object> entity = new HttpEntity<>(headers);
 
-        return restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
+
+        try {
+            return restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        } catch (RestClientException e) {
+            throw new EuxpRequestException("EUXP 시스템에 GET 요청 실패 | " + e.getMessage());
+        }
     }
 }

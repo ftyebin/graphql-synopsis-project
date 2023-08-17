@@ -7,9 +7,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import synopsis.graphql.config.ScsConfig;
+import synopsis.graphql.excpetion.ScsRequestException;
 import synopsis.graphql.model.dto.request.CustomScsPpvProducts;
 import synopsis.graphql.model.dto.request.CustomScsRequestBody;
 import synopsis.graphql.model.dto.request.RequestScsData;
@@ -71,11 +73,15 @@ public class ScsService {
                 .ppv_products(customScsPpvProducts)
             .build();
 
-        return restTemplate.exchange(
-                scsConfig.getUrl(),
-                HttpMethod.POST,
-                new HttpEntity<>(scsRequestBody, headers),
-                String.class
-        );
+        try {
+            return restTemplate.exchange(
+                    scsConfig.getUrl(),
+                    HttpMethod.POST,
+                    new HttpEntity<>(scsRequestBody, headers),
+                    String.class
+            );
+        } catch (RestClientException e) {
+            throw new ScsRequestException("Scs 시스템에 POST 요청 실패 | " + e.getMessage());
+        }
     }
 }

@@ -7,9 +7,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import synopsis.graphql.config.SmdConfig;
+import synopsis.graphql.excpetion.SmdRequestException;
 import synopsis.graphql.model.dto.request.RequestSmdData;
 import synopsis.graphql.model.smd.SmdResult;
 import synopsis.graphql.util.converter.SmdJsonToObjectConverter;
@@ -40,9 +42,13 @@ public class SmdService {
         String url = uriComponentsBuilder.toUriString();
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        return restTemplate.exchange(url,
-                HttpMethod.GET,
-                entity,
-                String.class);
+        try {
+            return restTemplate.exchange(url,
+                    HttpMethod.GET,
+                    entity,
+                    String.class);
+        } catch (RestClientException e) {
+            throw new SmdRequestException("SMD 시스템에 GET 요청 실패 | " + e.getMessage());
+        }
     }
 }
