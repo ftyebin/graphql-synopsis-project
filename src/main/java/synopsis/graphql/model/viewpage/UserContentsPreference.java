@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class UserContentsPreference {
     private LikeInfo likeInfo;
-    private boolean bookmark;
+    private Boolean bookmark;
 }
