@@ -1,8 +1,6 @@
 type ViewPage {
-    # type: SynopsisType
-    # banners: SynopsisBanner
+    banners: SynopsisBanner
     title: ContentsTitle
-    # comment: ContentsComment
     details: ContentsDetail
     contentsAdditional: ContentsAdditional
     userPreference: UserContentsPreference

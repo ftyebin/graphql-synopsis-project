@@ -30,24 +30,20 @@ public class ViewPageConverter {
         SmdResult smdResult = synopsisData.getSmdResult();
         ScsResult scsResult = synopsisData.getScsResult();
 
-
-        // Todo: SynopsisType type = getSynopsisType(euxpContents);
-        // Todo: SynopsisBanner banners = getSynopsisBanner(euxpContents);
-
         Contents euxpContents = Objects.requireNonNull(euxpResult).getContents();
+
+        SynopsisBanner banners = getSynopsisBanner(euxpContents);
         ContentsTitle title = getContentsTitle(euxpContents);
         ContentsDetail contentsDetail = getContentsDetail(euxpContents);
         ContentsAdditional contentsAdditional = getContentsAdditional(euxpContents);
-
         UserContentsPreference userPreference = getUserContentsPreference(smdResult, scsResult);
-
         ContentsEpisodeList episodeList = getContentsEpisodeList(euxpContents);
-
         PurchaseInfo purchaseInfo = getPurchaseInfo(euxpResult);
-
         PlayInfo playInfo = getPlayInfo(euxpContents);
 
+
         return ViewPage.builder()
+                .banners(banners)
                 .title(title)
                 .details(contentsDetail)
                 .contentsAdditional(contentsAdditional)
@@ -56,6 +52,36 @@ public class ViewPageConverter {
                 .purchaseInfo(purchaseInfo)
                 .playInfo(playInfo)
             .build();
+    }
+
+    private static SynopsisBanner getSynopsisBanner(Contents euxpContents) {
+        return SynopsisBanner.builder()
+                .imageBanner(
+                        SynopsisImageBanner.builder()
+                                .imagePath(euxpContents.sris_evt_comt_img_path)
+                                .callTypeCode(euxpContents.sris_evt_comt_call_typ_cd2)
+                                .callUrl(euxpContents.sris_evt_comt_call_url)
+                                .vasId(euxpContents.sris_evt_comt_call_objt_id)
+                                .vasServiceId(euxpContents.sris_evt_vas_svc_id)
+                            .build())
+                .textBanner(
+                        SynopsisTextBanner.builder()
+                                .text(euxpContents.sris_evt_comt_title)
+                                .callTypeCode(euxpContents.sris_evt_comt_call_typ_cd)
+                                .callUrl(euxpContents.sris_evt_comt_call_url)
+                                .vasId(euxpContents.sris_evt_comt_call_objt_id)
+                                .vasServiceId(euxpContents.sris_evt_vas_svc_id)
+                            .build()
+                )
+                .plccBanner(
+                        SynopsisPlccBanner.builder()
+                                .imagePath(euxpContents.sris_evt_comt_img_path2)
+                                .callTypeCode(euxpContents.sris_evt_comt_call_typ_cd2)
+                                .callUrl(euxpContents.sris_evt_comt_call_url2)
+                                .vasId(euxpContents.sris_evt_comt_call_objt_id2)
+                                .vasServiceId(euxpContents.sris_evt_vas_svc_id2)
+                            .build()
+                ).build();
     }
 
     private static PurchaseInfo getPurchaseInfo(EuxpResult euxpResult) {
@@ -140,8 +166,7 @@ public class ViewPageConverter {
         }
         var corners = euxpContents.corners;
         List<CornerPlay> cornerPlays = Collections.emptyList();
-        if (corners != null) {
-            if (!euxpContents.corners.isEmpty()) {
+        if (corners != null && (!euxpContents.corners.isEmpty())) {
                 cornerPlays = euxpContents.corners.stream()
                         .map(corner ->
                                 CornerPlay.builder()
@@ -153,7 +178,7 @@ public class ViewPageConverter {
                                         .imagePath(corner.img_path)
                                         .build())
                         .collect(Collectors.toCollection(ArrayList::new));
-            }
+
         }
 
         List<SpecialPlay> specialPlays = Collections.emptyList();
@@ -250,5 +275,4 @@ public class ViewPageConverter {
                 .textTitle(ContentsTextTitle.builder().text(euxpContents.title).build())
             .build();
     }
-
 }

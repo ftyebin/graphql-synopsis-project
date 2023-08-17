@@ -12,9 +12,9 @@ public class EuxpResult {
     public String request_time;
     public Contents contents;
     public List<Purchare> purchares;
-    public List<Object> series;
+    public List<Series> series;
     public int total_banner_count;
     public String response_time;
     public String IF;
-    public List<Object> banners;
+    public List<Banner> banners;
 }

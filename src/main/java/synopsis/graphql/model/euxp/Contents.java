@@ -61,7 +61,9 @@ public class Contents {
     public String sris_evt_comt_call_typ_cd;
     public String sris_evt_comt_call_url;
     public String sris_evt_comt_call_objt_id;
+    public String sris_evt_comt_call_objt_id2;
     public String sris_evt_vas_svc_id;
+    public String sris_evt_vas_svc_id2;
     public String sris_evt_vas_itm_id;
     public String sris_evt_comt_title2;
     public String sris_evt_comt_cts2;
