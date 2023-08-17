@@ -5,7 +5,7 @@ type ViewPage {
     # comment: ContentsComment
     details: ContentsDetail
     contentsAdditional: ContentsAdditional
-    # userPreference: UserContentsPreference
+    userPreference: UserContentsPreference
     episodeList: ContentsEpisodeList
     # purchaseInfo: PurchaseInfo
     playInfo: PlayInfo

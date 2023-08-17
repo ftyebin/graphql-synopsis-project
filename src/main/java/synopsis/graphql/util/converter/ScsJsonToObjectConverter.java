@@ -6,8 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import synopsis.graphql.model.scs.ScsResult;
 
 @Slf4j
-public
-class ScsJsonToObjectConverter {
+public class ScsJsonToObjectConverter {
 
     private ScsJsonToObjectConverter() {
         throw new IllegalStateException("Scs Json To Object Converter");

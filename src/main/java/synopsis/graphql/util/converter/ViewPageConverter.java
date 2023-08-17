@@ -16,6 +16,7 @@ import java.util.Objects;
 public class ViewPageConverter {
 
     private static final String YES = "Y";
+    private static final String LIKE_INFO_CHOSEN = "1";
     private static final int FIRST_INDEX = 0;
 
 
@@ -38,7 +39,7 @@ public class ViewPageConverter {
         ContentsDetail contentsDetail = getContentsDetail(euxpContents);
         ContentsAdditional contentsAdditional = getContentsAdditional(euxpContents);
 
-        // Todo: UserContentsPreference userPreference = getUserContentsPreference(euxpContents);
+        UserContentsPreference userPreference = getUserContentsPreference(smdResult, scsResult);
 
         ContentsEpisodeList episodeList = getContentsEpisodeList(euxpContents);
 
@@ -50,9 +51,26 @@ public class ViewPageConverter {
                 .title(title)
                 .details(contentsDetail)
                 .contentsAdditional(contentsAdditional)
+                .userPreference(userPreference)
                 .episodeList(episodeList)
                 .playInfo(playInfo)
             .build();
+    }
+
+    private static UserContentsPreference getUserContentsPreference(SmdResult smdResult, ScsResult scsResult) {
+        UserContentsPreference userPreference = new UserContentsPreference();
+
+        if (Objects.equals(smdResult.like, LIKE_INFO_CHOSEN)) {
+            userPreference.setLikeInfo(LikeInfo.LIKE);
+        } else if (Objects.equals(smdResult.dislike, LIKE_INFO_CHOSEN)) {
+            userPreference.setLikeInfo(LikeInfo.DISLIKE);
+        } else {
+            userPreference.setLikeInfo(LikeInfo.NONE);
+        }
+
+        userPreference.setBookmark(Objects.equals(scsResult.is_bookmark, YES));
+
+        return userPreference;
     }
 
 
