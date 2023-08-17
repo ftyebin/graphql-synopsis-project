@@ -3,6 +3,7 @@ package synopsis.graphql.util.converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import synopsis.graphql.excpetion.JsonToObjectException;
 import synopsis.graphql.model.scs.ScsResult;
 
 @Slf4j
@@ -18,7 +19,7 @@ public class ScsJsonToObjectConverter {
         try {
             return objectMapper.readValue(jsonData, ScsResult.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonToObjectException("Error found at " + e.getLocation() + " | SCS Json Object Mapping Error : " + e.getMessage());
         }
     }
 }

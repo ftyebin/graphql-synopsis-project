@@ -133,12 +133,37 @@ public class ViewPageConverter {
 
 
     private static PlayInfo getPlayInfo(Contents euxpContents) {
+
+        MainPreviewPlay mainPreviewPlay = getMainPreviewPlay(euxpContents);
+        TrailerPlay trailerPlay = getTrailerPlay(euxpContents);
+        AIHighlightPlay aiHighlightPlay = getAiHighlightPlay(euxpContents);
+        List<CornerPlay> cornerPlays = getCornerPlays(euxpContents);
+        List<SpecialPlay> specialPlays = getSpecialPlays(euxpContents);
+
+        return PlayInfo.builder()
+                .mainPreviewPlay(mainPreviewPlay)
+                .trailerPlay(trailerPlay)
+                .aiHighlightPlay(aiHighlightPlay)
+                .cornerPlays(cornerPlays)
+                .specialPlays(specialPlays)
+            .build();
+    }
+
+    private static TrailerPlay getTrailerPlay(Contents euxpContents) {
+        return TrailerPlay.builder()
+                .episodeId(euxpContents.epsd_id)
+                .seriesId(euxpContents.sris_id)
+                .productPriceId(euxpContents.preview.get(FIRST_INDEX).prd_prc_id)
+            .build();
+    }
+
+    private static MainPreviewPlay getMainPreviewPlay(Contents euxpContents) {
         List<EpsdRsluInfo> sortedEpsdRsluInfo = euxpContents.epsd_rslu_info.stream()
                 .sorted(Comparator.comparing(e -> e.rslu_typ_cd))
                 .toList();
         EpsdRsluInfo epsdRsluInfo = sortedEpsdRsluInfo.get(FIRST_INDEX);
 
-        MainPreviewPlay mainPreviewPlay = MainPreviewPlay.builder()
+        return MainPreviewPlay.builder()
                 .episodeId(euxpContents.epsd_id)
                 .seriesId(euxpContents.sris_id)
                 .episodeResolutionId(epsdRsluInfo.epsd_rslu_id)
@@ -146,13 +171,9 @@ public class ViewPageConverter {
                 .previewTime(Integer.parseInt(epsdRsluInfo.preview_time))
                 .totalTime(Integer.parseInt(euxpContents.play_time))
             .build();
+    }
 
-        TrailerPlay trailerPlay = TrailerPlay.builder()
-                .episodeId(euxpContents.epsd_id)
-                .seriesId(euxpContents.sris_id)
-                .productPriceId(euxpContents.preview.get(FIRST_INDEX).prd_prc_id)
-            .build();
-
+    private static AIHighlightPlay getAiHighlightPlay(Contents euxpContents) {
         AIHighlightPlay aiHighlightPlay;
         if (euxpContents.ai_inside_scenes.isEmpty()) {
             aiHighlightPlay = null;
@@ -164,23 +185,10 @@ public class ViewPageConverter {
                     .previewTime(PREVIEW_TIME_FIXED)
                 .build();
         }
-        var corners = euxpContents.corners;
-        List<CornerPlay> cornerPlays = Collections.emptyList();
-        if (corners != null && (!euxpContents.corners.isEmpty())) {
-                cornerPlays = euxpContents.corners.stream()
-                        .map(corner ->
-                                CornerPlay.builder()
-                                        .cornerBottomName(corner.cnr_btm_nm)
-                                        .cornerGroupName(corner.cnr_grp_id)
-                                        .cornerId(corner.cnr_id)
-                                        .cornerName(corner.cnr_nm)
-                                        .episodeResolutionId(corner.epsd_rslu_id)
-                                        .imagePath(corner.img_path)
-                                        .build())
-                        .collect(Collectors.toCollection(ArrayList::new));
+        return aiHighlightPlay;
+    }
 
-        }
-
+    private static List<SpecialPlay> getSpecialPlays(Contents euxpContents) {
         List<SpecialPlay> specialPlays = Collections.emptyList();
         if (!euxpContents.special.isEmpty()) {
             specialPlays = euxpContents.special.stream()
@@ -193,15 +201,32 @@ public class ViewPageConverter {
                                     .build())
                     .collect(Collectors.toCollection(ArrayList::new));
         }
+        return specialPlays;
+    }
 
+    private static List<CornerPlay> getCornerPlays(Contents euxpContents) {
+        var corners = euxpContents.corners;
+        List<CornerPlay> cornerPlays = Collections.emptyList();
+        if (corners != null && (!euxpContents.corners.isEmpty())) {
+            cornerPlays = getCornerPlayList(euxpContents);
+        }
+        return cornerPlays;
+    }
 
-        return PlayInfo.builder()
-                .mainPreviewPlay(mainPreviewPlay)
-                .trailerPlay(trailerPlay)
-                .aiHighlightPlay(aiHighlightPlay)
-                .cornerPlays(cornerPlays)
-                .specialPlays(specialPlays)
-            .build();
+    private static List<CornerPlay> getCornerPlayList(Contents euxpContents) {
+        List<CornerPlay> cornerPlays;
+        cornerPlays = euxpContents.corners.stream()
+                .map(corner ->
+                        CornerPlay.builder()
+                                .cornerBottomName(corner.cnr_btm_nm)
+                                .cornerGroupName(corner.cnr_grp_id)
+                                .cornerId(corner.cnr_id)
+                                .cornerName(corner.cnr_nm)
+                                .episodeResolutionId(corner.epsd_rslu_id)
+                                .imagePath(corner.img_path)
+                                .build())
+                .collect(Collectors.toCollection(ArrayList::new));
+        return cornerPlays;
     }
 
     private static ContentsEpisodeList getContentsEpisodeList(Contents euxpContents) {
