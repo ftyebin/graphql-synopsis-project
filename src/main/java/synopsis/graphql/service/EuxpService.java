@@ -15,16 +15,20 @@ import synopsis.graphql.excpetion.EuxpRequestException;
 import synopsis.graphql.model.dto.request.RequestEuxpData;
 import synopsis.graphql.model.euxp.EuxpResult;
 import synopsis.graphql.util.converter.EuxpJsonToObjectConverter;
+import synopsis.graphql.util.converter.JsonToObjectConverter;
 
 @RequiredArgsConstructor
 @Service
 public class EuxpService {
+
     private final RestTemplate restTemplate;
     private final EuxpConfig euxpConfig;
+    private final JsonToObjectConverter<EuxpResult> euxpConverter = new EuxpJsonToObjectConverter();
+
 
     public EuxpResult getEuxpResult(RequestEuxpData requestEuxpData) {
         ResponseEntity<String> response = getEuxpResponse(requestEuxpData);
-        return EuxpJsonToObjectConverter.convert(response.getBody())
+        return euxpConverter.convert(response.getBody())
                 .orElseThrow(() -> new ResultDataNotFoundException("EUXP Result data not found"));
     }
 

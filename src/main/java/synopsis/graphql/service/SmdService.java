@@ -15,18 +15,22 @@ import synopsis.graphql.excpetion.ResultDataNotFoundException;
 import synopsis.graphql.excpetion.SmdRequestException;
 import synopsis.graphql.model.dto.request.RequestSmdData;
 import synopsis.graphql.model.smd.SmdResult;
+import synopsis.graphql.util.converter.JsonToObjectConverter;
 import synopsis.graphql.util.converter.SmdJsonToObjectConverter;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class SmdService {
+
     private final SmdConfig smdConfig;
     private final RestTemplate restTemplate;
+    private final JsonToObjectConverter<SmdResult> smdConverter = new SmdJsonToObjectConverter();
+
 
     public SmdResult getSmdResult(RequestSmdData requestSmdData) {
         ResponseEntity<String> response = getSmdResponse(requestSmdData);
-        return SmdJsonToObjectConverter.convert(response.getBody())
+        return smdConverter.convert(response.getBody())
                 .orElseThrow(() -> new ResultDataNotFoundException("SMD Result data not found"));
     }
 

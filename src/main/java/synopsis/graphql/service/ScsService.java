@@ -18,6 +18,7 @@ import synopsis.graphql.model.dto.request.CustomScsRequestBody;
 import synopsis.graphql.model.dto.request.RequestScsData;
 import synopsis.graphql.model.dto.request.RequestScsPpvProduct;
 import synopsis.graphql.model.scs.ScsResult;
+import synopsis.graphql.util.converter.JsonToObjectConverter;
 import synopsis.graphql.util.converter.ScsJsonToObjectConverter;
 
 import java.util.Collections;
@@ -35,6 +36,8 @@ public class ScsService {
 
     private final ScsConfig scsConfig;
     private final RestTemplate restTemplate;
+    private final JsonToObjectConverter<ScsResult> scsConverter = new ScsJsonToObjectConverter();
+
 
     private CustomScsPpvProducts toCustomPpvProducts(RequestScsPpvProduct product) {
         log.info(product.toString());
@@ -50,7 +53,7 @@ public class ScsService {
 
     public ScsResult getScsResult(RequestScsData requestScsData){
         ResponseEntity<String> response = getScsResponse(requestScsData);
-        return ScsJsonToObjectConverter.convert(response.getBody())
+        return scsConverter.convert(response.getBody())
                 .orElseThrow(() -> new ResultDataNotFoundException("SCS Result data not found"));
     }
 
