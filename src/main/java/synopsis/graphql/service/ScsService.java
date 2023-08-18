@@ -11,6 +11,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import synopsis.graphql.config.ScsConfig;
+import synopsis.graphql.excpetion.ResultDataNotFoundException;
 import synopsis.graphql.excpetion.ScsRequestException;
 import synopsis.graphql.model.dto.request.CustomScsPpvProducts;
 import synopsis.graphql.model.dto.request.CustomScsRequestBody;
@@ -19,8 +20,9 @@ import synopsis.graphql.model.dto.request.RequestScsPpvProduct;
 import synopsis.graphql.model.scs.ScsResult;
 import synopsis.graphql.util.converter.ScsJsonToObjectConverter;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -31,11 +33,10 @@ public class ScsService {
     private static final String RESPONSE_FORMAT = "json";
     private static final String VERSION = "5.3.0";
 
-
     private final ScsConfig scsConfig;
     private final RestTemplate restTemplate;
 
-    private CustomScsPpvProducts setCustomPpvProducts(RequestScsPpvProduct product) {
+    private CustomScsPpvProducts toCustomPpvProducts(RequestScsPpvProduct product) {
         log.info(product.toString());
         return CustomScsPpvProducts.builder()
                 .prd_prc_id(product.getProductPriceId())
@@ -49,20 +50,36 @@ public class ScsService {
 
     public ScsResult getScsResult(RequestScsData requestScsData){
         ResponseEntity<String> response = getScsResponse(requestScsData);
-        return ScsJsonToObjectConverter.convert(response.getBody());
+        return ScsJsonToObjectConverter.convert(response.getBody())
+                .orElseThrow(() -> new ResultDataNotFoundException("SCS Result data not found"));
     }
 
     public ResponseEntity<String> getScsResponse(RequestScsData requestScsData) {
-        List<CustomScsPpvProducts> customScsPpvProducts = new ArrayList<>();
+        List<CustomScsPpvProducts> customScsPpvProducts =
+                Optional.ofNullable(requestScsData.getPpvProducts())
+                        .orElse(Collections.emptyList())
+                        .stream()
+                        .map(this::toCustomPpvProducts)
+                    .toList();
 
+
+        HttpHeaders headers = constructHeaders();
+
+        CustomScsRequestBody scsRequestBody = createRequestBody(requestScsData, customScsPpvProducts);
+
+        return sendScsRequest(scsRequestBody, headers);
+    }
+
+    private HttpHeaders constructHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        scsConfig.getHeaders().forEach(headers::set);
+        if (scsConfig != null && scsConfig.getHeaders() != null) {
+            scsConfig.getHeaders().forEach(headers::set);
+        }
+        return headers;
+    }
 
-        requestScsData.getPpvProducts()
-                .forEach(product -> customScsPpvProducts.add(setCustomPpvProducts(product)));
-
-
-        CustomScsRequestBody scsRequestBody = CustomScsRequestBody.builder()
+    private CustomScsRequestBody createRequestBody(RequestScsData requestScsData, List<CustomScsPpvProducts> customScsPpvProducts) {
+        return CustomScsRequestBody.builder()
                 .response_format(RESPONSE_FORMAT)
                 .ver(VERSION)
                 .stb_id(requestScsData.getStbId())
@@ -71,17 +88,19 @@ public class ScsService {
                 .sris_id(requestScsData.getSeriesId())
                 .synopsis_type(requestScsData.getSynopsisSearchType())
                 .ppv_products(customScsPpvProducts)
-            .build();
+                .build();
+    }
 
+    private ResponseEntity<String> sendScsRequest(CustomScsRequestBody body, HttpHeaders headers) {
         try {
             return restTemplate.exchange(
                     scsConfig.getUrl(),
                     HttpMethod.POST,
-                    new HttpEntity<>(scsRequestBody, headers),
+                    new HttpEntity<>(body, headers),
                     String.class
             );
         } catch (RestClientException e) {
-            throw new ScsRequestException("Scs 시스템에 POST 요청 실패 | " + e.getMessage());
+            throw new ScsRequestException("Scs 시스템에 POST 요청 실패. URL: " + scsConfig.getUrl() + " | Error: " + e.getMessage());
         }
     }
 }

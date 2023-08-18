@@ -11,6 +11,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import synopsis.graphql.config.SmdConfig;
+import synopsis.graphql.excpetion.ResultDataNotFoundException;
 import synopsis.graphql.excpetion.SmdRequestException;
 import synopsis.graphql.model.dto.request.RequestSmdData;
 import synopsis.graphql.model.smd.SmdResult;
@@ -23,32 +24,39 @@ public class SmdService {
     private final SmdConfig smdConfig;
     private final RestTemplate restTemplate;
 
-    public SmdResult getSmdResult(RequestSmdData requestSmdData){
-
+    public SmdResult getSmdResult(RequestSmdData requestSmdData) {
         ResponseEntity<String> response = getSmdResponse(requestSmdData);
-        return SmdJsonToObjectConverter.convert(response.getBody());
+        return SmdJsonToObjectConverter.convert(response.getBody())
+                .orElseThrow(() -> new ResultDataNotFoundException("SMD Result data not found"));
     }
 
     public ResponseEntity<String> getSmdResponse(RequestSmdData requestSmdData) {
-        HttpHeaders headers = new HttpHeaders();
-        smdConfig.getHeaders().forEach(headers::set);
+        String url = constructUrl(requestSmdData);
+        HttpEntity<Void> entity = new HttpEntity<>(constructHeaders());
+        try {
+            return restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        } catch (RestClientException e) {
+            throw new SmdRequestException("SMD 시스템에 GET 요청 실패 | " + e.getMessage());
+        }
+    }
 
+    private HttpHeaders constructHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        if (smdConfig != null && smdConfig.getHeaders() != null) {
+            smdConfig.getHeaders().forEach(headers::set);
+        }
+        return headers;
+    }
+
+    private String constructUrl(RequestSmdData requestSmdData) {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(smdConfig.getUrl())
                 .queryParam("mac_address", requestSmdData.getMac())
                 .queryParam("stb_id", requestSmdData.getStbId())
                 .queryParam("series_id", requestSmdData.getSeriesId());
-        smdConfig.getParams().forEach(uriComponentsBuilder::queryParam);
 
-        String url = uriComponentsBuilder.toUriString();
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        try {
-            return restTemplate.exchange(url,
-                    HttpMethod.GET,
-                    entity,
-                    String.class);
-        } catch (RestClientException e) {
-            throw new SmdRequestException("SMD 시스템에 GET 요청 실패 | " + e.getMessage());
+        if (smdConfig.getParams() != null) {
+            smdConfig.getParams().forEach(uriComponentsBuilder::queryParam);
         }
+        return uriComponentsBuilder.toUriString();
     }
 }
