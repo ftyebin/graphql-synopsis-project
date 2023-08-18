@@ -1,6 +1,7 @@
 package synopsis.graphql.util.converter;
 
 import lombok.extern.slf4j.Slf4j;
+import synopsis.graphql.excpetion.ResultDataNotFoundException;
 import synopsis.graphql.model.dto.response.SynopsisData;
 import synopsis.graphql.model.euxp.*;
 import synopsis.graphql.model.scs.ScsResult;
@@ -31,6 +32,17 @@ public class ViewPageConverter {
         ScsResult scsResult = synopsisData.getScsResult();
 
         Contents euxpContents = Objects.requireNonNull(euxpResult).getContents();
+
+        if (euxpContents == null) {
+            throw new ResultDataNotFoundException("EUXP data is null");
+        }
+        if (smdResult == null) {
+            throw new ResultDataNotFoundException("SMD data is null");
+        }
+        if (scsResult == null) {
+            throw new ResultDataNotFoundException("SCS data is null");
+        }
+
 
         SynopsisBanner banners = getSynopsisBanner(euxpContents);
         ContentsTitle title = getContentsTitle(euxpContents);

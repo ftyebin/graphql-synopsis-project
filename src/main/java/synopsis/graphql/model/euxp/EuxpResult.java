@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class EuxpResult {
-    private String result;
+    public String result;
     public String reason;
     public String request_time;
     public Contents contents;

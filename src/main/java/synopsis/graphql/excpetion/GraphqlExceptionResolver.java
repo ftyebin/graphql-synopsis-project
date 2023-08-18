@@ -19,7 +19,7 @@ public class GraphqlExceptionResolver extends DataFetcherExceptionResolverAdapte
             errorType = ErrorType.ExecutionAborted;
         } else if (ex instanceof JsonToObjectException || ex instanceof JsonPropertyException) {
             errorType = ErrorType.ValidationError;
-        } else if (ex instanceof ResultDataNotFoundException) {
+        } else if (ex instanceof ResultDataNotFoundException || ex instanceof IllegalArgumentException) {
             errorType = ErrorType.DataFetchingException;
         } else {
             return null;

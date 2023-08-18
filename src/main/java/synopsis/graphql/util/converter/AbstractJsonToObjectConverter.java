@@ -12,7 +12,7 @@ import synopsis.graphql.excpetion.JsonToObjectException;
 import java.util.Optional;
 
 @Slf4j
-public abstract class AbstractJsonToObjectConverter<T> implements  JsonToObjectConverter<T> {
+public abstract class AbstractJsonToObjectConverter<T> implements JsonToObjectConverter<T> {
 
     private final Class<T> type;
     private final String typeName;
