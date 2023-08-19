@@ -3,8 +3,8 @@ package synopsis.graphql.util.converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import synopsis.graphql.config.ObjectMapperHolder;
 import synopsis.graphql.excpetion.JsonConversionException;
 import synopsis.graphql.excpetion.JsonPropertyException;
 import synopsis.graphql.excpetion.JsonToObjectException;
@@ -12,20 +12,15 @@ import synopsis.graphql.excpetion.JsonToObjectException;
 import java.util.Optional;
 
 @Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractJsonToObjectConverter<T> implements JsonToObjectConverter<T> {
 
     private final Class<T> type;
     private final String typeName;
-
-    protected AbstractJsonToObjectConverter(Class<T> type, String typeName) {
-        this.type = type;
-        this.typeName = typeName;
-    }
+    private final ObjectMapper objectMapper;
 
     @Override
     public Optional<T> convert(String jsonData) {
-
-        ObjectMapper objectMapper = ObjectMapperHolder.getMapper();
 
         String errorMessage;
 
