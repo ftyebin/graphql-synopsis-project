@@ -1,315 +1,98 @@
 package synopsis.graphql.util.converter;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import synopsis.graphql.excpetion.ResultDataNotFoundException;
 import synopsis.graphql.model.dto.response.SynopsisData;
 import synopsis.graphql.model.euxp.*;
 import synopsis.graphql.model.scs.ScsResult;
 import synopsis.graphql.model.smd.SmdResult;
 import synopsis.graphql.model.viewpage.*;
-import synopsis.graphql.model.viewpage.StillCut;
+import synopsis.graphql.util.converter.viewpage.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
+@Service
+@RequiredArgsConstructor
 @Slf4j
 public class ViewPageConverter {
 
-    private static final String YES = "Y";
-    private static final String LIKE_INFO_CHOSEN = "1";
-    private static final int FIRST_INDEX = 0;
-    private static final Integer PREVIEW_TIME_FIXED = 180;
+    private static final String RESULT_DATA_NOT_FOUND = "응답 결과 데이터에 오류가 있습니다.";
 
+    private final SynopsisBannerConverter synopsisBannerConverter;
+    private final ContentsTitleConverter contentsTitleConverter;
+    private final ContentsDetailConverter contentsDetailConverter;
+    private final ContentsAdditionalConverter contentsAdditionalConverter;
+    private final UserContentsPreferenceConverter userContentsPreferenceConverter;
+    private final ContentsEpisodeListConverter contentsEpisodeListConverter;
+    private final PurchaseInfoConverter purchaseInfoConverter;
+    private final PlayInfoConverter playInfoConverter;
 
-    private ViewPageConverter(){
-        throw new IllegalStateException("View Page Converter");
-    }
+    public ViewPage convert(SynopsisData synopsisData) {
 
-    public static ViewPage convert(SynopsisData synopsisData) {
+        EuxpResult euxpResult = getEuxpResult(synopsisData);
+        SmdResult smdResult = getSmdResult(synopsisData);
+        ScsResult scsResult = getScsResult(synopsisData);
 
-        EuxpResult euxpResult = synopsisData.getEuxpResult();
-        SmdResult smdResult = synopsisData.getSmdResult();
-        ScsResult scsResult = synopsisData.getScsResult();
+        validateSynopsisData(synopsisData);
 
-        Contents euxpContents = Objects.requireNonNull(euxpResult).getContents();
-
-        if (euxpContents == null) {
-            throw new ResultDataNotFoundException("EUXP data is null");
-        }
-        if (smdResult == null) {
-            throw new ResultDataNotFoundException("SMD data is null");
-        }
-        if (scsResult == null) {
-            throw new ResultDataNotFoundException("SCS data is null");
-        }
-
-
-        SynopsisBanner banners = getSynopsisBanner(euxpContents);
-        ContentsTitle title = getContentsTitle(euxpContents);
-        ContentsDetail contentsDetail = getContentsDetail(euxpContents);
-        ContentsAdditional contentsAdditional = getContentsAdditional(euxpContents);
-        UserContentsPreference userPreference = getUserContentsPreference(smdResult, scsResult);
-        ContentsEpisodeList episodeList = getContentsEpisodeList(euxpContents);
-        PurchaseInfo purchaseInfo = getPurchaseInfo(euxpResult);
-        PlayInfo playInfo = getPlayInfo(euxpContents);
-
+        Contents euxpContents = euxpResult.getContents();
 
         return ViewPage.builder()
-                .banners(banners)
-                .title(title)
-                .details(contentsDetail)
-                .contentsAdditional(contentsAdditional)
-                .userPreference(userPreference)
-                .episodeList(episodeList)
-                .purchaseInfo(purchaseInfo)
-                .playInfo(playInfo)
+                .banners(synopsisBannerConverter.convert(euxpContents))
+                .title(contentsTitleConverter.convert(euxpContents))
+                .details(contentsDetailConverter.convert(euxpContents))
+                .contentsAdditional(contentsAdditionalConverter.convert(euxpContents))
+                .userPreference(userContentsPreferenceConverter.convert(smdResult, scsResult))
+                .episodeList(contentsEpisodeListConverter.convert(euxpContents))
+                .purchaseInfo(purchaseInfoConverter.convert(euxpResult))
+                .playInfo(playInfoConverter.convert(euxpContents))
             .build();
     }
 
-    private static SynopsisBanner getSynopsisBanner(Contents euxpContents) {
-        return SynopsisBanner.builder()
-                .imageBanner(
-                        SynopsisImageBanner.builder()
-                                .imagePath(euxpContents.sris_evt_comt_img_path)
-                                .callTypeCode(euxpContents.sris_evt_comt_call_typ_cd2)
-                                .callUrl(euxpContents.sris_evt_comt_call_url)
-                                .vasId(euxpContents.sris_evt_comt_call_objt_id)
-                                .vasServiceId(euxpContents.sris_evt_vas_svc_id)
-                            .build())
-                .textBanner(
-                        SynopsisTextBanner.builder()
-                                .text(euxpContents.sris_evt_comt_title)
-                                .callTypeCode(euxpContents.sris_evt_comt_call_typ_cd)
-                                .callUrl(euxpContents.sris_evt_comt_call_url)
-                                .vasId(euxpContents.sris_evt_comt_call_objt_id)
-                                .vasServiceId(euxpContents.sris_evt_vas_svc_id)
-                            .build()
-                )
-                .plccBanner(
-                        SynopsisPlccBanner.builder()
-                                .imagePath(euxpContents.sris_evt_comt_img_path2)
-                                .callTypeCode(euxpContents.sris_evt_comt_call_typ_cd2)
-                                .callUrl(euxpContents.sris_evt_comt_call_url2)
-                                .vasId(euxpContents.sris_evt_comt_call_objt_id2)
-                                .vasServiceId(euxpContents.sris_evt_vas_svc_id2)
-                            .build()
-                ).build();
+    private <T> T getRequiredData(Supplier<T> dataSupplier, String errorPrefix) {
+        T data = dataSupplier.get();
+        if (data == null) {
+            throw new ResultDataNotFoundException(errorPrefix + RESULT_DATA_NOT_FOUND);
+        }
+        return data;
     }
 
-    private static PurchaseInfo getPurchaseInfo(EuxpResult euxpResult) {
-
-        List<Purchare> purchares = euxpResult.getPurchares();
-        ArrayList<Product> products = new ArrayList<>();
-
-        purchares.forEach(purchare -> products.add(Product.builder()
-                .productTypeCode(purchare.prd_typ_cd)
-                .episodeId(purchare.epsd_id)
-                .episodeResolutionId(purchare.epsd_rslu_id)
-                .discountTypeCode(purchare.dsc_typ_cd)
-                .languageCaptionTypeCode(purchare.lag_capt_typ_cd)
-                .isNscreen(purchare.nscrn_yn.equals(YES))
-                .isPossession(purchare.possn_yn.equals(YES))
-                .isPpmFreeJoin(purchare.ppm_free_join_yn.equals(YES))
-                .ppmGridIconImagePath(purchare.ppm_grid_icon_img_path)
-                .ppmProductName(purchare.ppm_prd_nm)
-                .productPriceId(purchare.prd_prc_id)
-                .productPriceVat((int) purchare.prd_prc_vat)
-                .salePrice((int) purchare.sale_prc)
-                .salePriceVat((int) purchare.sale_prc_vat)
-                .purchasePreferenceRank(purchare.purc_pref_rank)
-                .purchasedWatchedCount(purchare.purc_wat_dd_cnt + purchare.purc_wat_dd_fg_cd)
-                .resolutionTypeCode(purchare.rslu_typ_cd)
-                .isUsed(purchare.use_yn.equals(YES))
-                .isReservation(euxpResult.getContents().rsv_orgnz_yn.equals(YES))
-            .build()
-        ));
-
-        return PurchaseInfo.builder().products(products).build();
+    private EuxpResult getEuxpResult(SynopsisData synopsisData) {
+        return getRequiredData(synopsisData::getEuxpResult, "EUXP");
     }
 
-    private static UserContentsPreference getUserContentsPreference(SmdResult smdResult, ScsResult scsResult) {
-        UserContentsPreference userPreference = new UserContentsPreference();
+    private SmdResult getSmdResult(SynopsisData synopsisData) {
+        return getRequiredData(synopsisData::getSmdResult, "SMD");
+    }
 
-        if (Objects.equals(smdResult.like, LIKE_INFO_CHOSEN)) {
-            userPreference.setLikeInfo(LikeInfo.LIKE);
-        } else if (Objects.equals(smdResult.dislike, LIKE_INFO_CHOSEN)) {
-            userPreference.setLikeInfo(LikeInfo.DISLIKE);
-        } else {
-            userPreference.setLikeInfo(LikeInfo.NONE);
+    private ScsResult getScsResult(SynopsisData synopsisData) {
+        return getRequiredData(synopsisData::getScsResult, "SCS");
+    }
+
+    private void validateSynopsisData(SynopsisData synopsisData) {
+        List<String> errors = new ArrayList<>();
+
+        if (synopsisData.getEuxpResult() == null || synopsisData.getEuxpResult().getContents() == null) {
+            errors.add("EUXP" + RESULT_DATA_NOT_FOUND);
+        }
+        if (synopsisData.getSmdResult() == null) {
+            errors.add("SMD" + RESULT_DATA_NOT_FOUND);
+        }
+        if (synopsisData.getScsResult() == null) {
+            errors.add("SCS" + RESULT_DATA_NOT_FOUND);
         }
 
-        userPreference.setBookmark(Objects.equals(scsResult.is_bookmark, YES));
-
-        return userPreference;
+        handleErrors(errors);
     }
 
-
-    private static PlayInfo getPlayInfo(Contents euxpContents) {
-
-        MainPreviewPlay mainPreviewPlay = getMainPreviewPlay(euxpContents);
-        TrailerPlay trailerPlay = getTrailerPlay(euxpContents);
-        AIHighlightPlay aiHighlightPlay = getAiHighlightPlay(euxpContents);
-        List<CornerPlay> cornerPlays = getCornerPlays(euxpContents);
-        List<SpecialPlay> specialPlays = getSpecialPlays(euxpContents);
-
-        return PlayInfo.builder()
-                .mainPreviewPlay(mainPreviewPlay)
-                .trailerPlay(trailerPlay)
-                .aiHighlightPlay(aiHighlightPlay)
-                .cornerPlays(cornerPlays)
-                .specialPlays(specialPlays)
-            .build();
-    }
-
-    private static TrailerPlay getTrailerPlay(Contents euxpContents) {
-        return TrailerPlay.builder()
-                .episodeId(euxpContents.epsd_id)
-                .seriesId(euxpContents.sris_id)
-                .productPriceId(euxpContents.preview.get(FIRST_INDEX).prd_prc_id)
-            .build();
-    }
-
-    private static MainPreviewPlay getMainPreviewPlay(Contents euxpContents) {
-        List<EpsdRsluInfo> sortedEpsdRsluInfo = euxpContents.epsd_rslu_info.stream()
-                .sorted(Comparator.comparing(e -> e.rslu_typ_cd))
-                .toList();
-        EpsdRsluInfo epsdRsluInfo = sortedEpsdRsluInfo.get(FIRST_INDEX);
-
-        return MainPreviewPlay.builder()
-                .episodeId(euxpContents.epsd_id)
-                .seriesId(euxpContents.sris_id)
-                .episodeResolutionId(epsdRsluInfo.epsd_rslu_id)
-                .startTime((int) epsdRsluInfo.openg_tmtag_tmsc)
-                .previewTime(Integer.parseInt(epsdRsluInfo.preview_time))
-                .totalTime(Integer.parseInt(euxpContents.play_time))
-            .build();
-    }
-
-    private static AIHighlightPlay getAiHighlightPlay(Contents euxpContents) {
-        AIHighlightPlay aiHighlightPlay;
-        if (euxpContents.ai_inside_scenes.isEmpty()) {
-            aiHighlightPlay = null;
-        } else {
-            aiHighlightPlay = AIHighlightPlay.builder()
-                    .episodeId(euxpContents.epsd_id)
-                    .seriesId(euxpContents.sris_id)
-                    .startTime(Integer.valueOf(euxpContents.ai_inside_scenes.get(FIRST_INDEX).tmtag_fr_tmsc))
-                    .previewTime(PREVIEW_TIME_FIXED)
-                .build();
+    private void handleErrors(List<String> errors) {
+        if (!errors.isEmpty()) {
+            String errorMessage = String.join(", ", errors);
+            log.error(errorMessage);
+            throw new ResultDataNotFoundException(errorMessage);
         }
-        return aiHighlightPlay;
-    }
-
-    private static List<SpecialPlay> getSpecialPlays(Contents euxpContents) {
-        List<SpecialPlay> specialPlays = Collections.emptyList();
-        if (!euxpContents.special.isEmpty()) {
-            specialPlays = euxpContents.special.stream()
-                    .map(special ->
-                            SpecialPlay.builder()
-                                    .episodeResolutionId(special.epsd_rslu_id)
-                                    .imagePath(special.img_path)
-                                    .productPriceId(special.prd_prc_id)
-                                    .title(special.title)
-                                    .build())
-                    .collect(Collectors.toCollection(ArrayList::new));
-        }
-        return specialPlays;
-    }
-
-    private static List<CornerPlay> getCornerPlays(Contents euxpContents) {
-        var corners = euxpContents.corners;
-        List<CornerPlay> cornerPlays = Collections.emptyList();
-        if (corners != null && (!euxpContents.corners.isEmpty())) {
-            cornerPlays = getCornerPlayList(euxpContents);
-        }
-        return cornerPlays;
-    }
-
-    private static List<CornerPlay> getCornerPlayList(Contents euxpContents) {
-        List<CornerPlay> cornerPlays;
-        cornerPlays = euxpContents.corners.stream()
-                .map(corner ->
-                        CornerPlay.builder()
-                                .cornerBottomName(corner.cnr_btm_nm)
-                                .cornerGroupName(corner.cnr_grp_id)
-                                .cornerId(corner.cnr_id)
-                                .cornerName(corner.cnr_nm)
-                                .episodeResolutionId(corner.epsd_rslu_id)
-                                .imagePath(corner.img_path)
-                                .build())
-                .collect(Collectors.toCollection(ArrayList::new));
-        return cornerPlays;
-    }
-
-    private static ContentsEpisodeList getContentsEpisodeList(Contents euxpContents) {
-        ContentsEpisode contentsEpisode = ContentsEpisode.builder()
-                .imagePath(euxpContents.epsd_poster_filename_h)
-                .episodeNumber(euxpContents.brcast_tseq_nm)
-                .isNotBroadcasted(String.valueOf(Objects.equals(euxpContents.cacbro_yn, YES)
-                        ? Boolean.TRUE
-                        : Boolean.FALSE)
-                )
-            .build();
-
-        return ContentsEpisodeList.builder()
-                .list(Collections.singletonList(contentsEpisode))
-                .build();
-    }
-
-    private static ContentsAdditional getContentsAdditional(Contents euxpContents) {
-        ArrayList<StillCut> stillCuts = new ArrayList<>();
-        euxpContents.stillCut.forEach(still -> stillCuts.add(StillCut.builder().imagePath(still.img_path).build()));
-
-        return ContentsAdditional.builder()
-                .stillCut(stillCuts)
-                .similarContents(SimilarContents.builder().callId(euxpContents.cw_call_id_val).build())
-            .build();
-    }
-
-    private static ContentsDetail getContentsDetail(Contents euxpContents) {
-        List<Cast> casts = new ArrayList<>();
-        euxpContents.peoples
-                .forEach(cast -> casts.add(
-                        Cast.builder()
-                                .birth(cast.brth_ymd)
-                                .imagePath(cast.img_path)
-                                .id(cast.prs_id)
-                                .actorName(cast.prs_nm)
-                                .castingName(cast.prs_plrl_nm)
-                                .roleCode(cast.prs_role_cd)
-                                .roleName(cast.prs_role_nm)
-                                .build()
-                ));
-
-        ArrayList<Prize> prizes = new ArrayList<>();
-        euxpContents.site_review.prize_history
-                .forEach(prize -> prizes.add(
-                        Prize.builder()
-                                .name(prize.awardc_nm)
-                                .description(prize.prize_dts_cts)
-                                .year(prize.prize_yr)
-                                .build()
-                ));
-
-
-        return ContentsDetail.builder()
-                .summary(euxpContents.epsd_snss_cts)
-                .castInfos(casts)
-                .prizeInfos(prizes)
-            .build();
-    }
-
-    private static ContentsTitle getContentsTitle(Contents euxpContents) {
-        return ContentsTitle.builder()
-                .imageTitle(
-                        ContentsImageTitle.builder()
-                                .isDark(Objects.equals(euxpContents.dark_img_yn, YES)
-                                        ? Boolean.TRUE
-                                        : Boolean.FALSE)
-
-                                .imagePath(euxpContents.title_img_path)
-                            .build())
-                .textTitle(ContentsTextTitle.builder().text(euxpContents.title).build())
-            .build();
     }
 }

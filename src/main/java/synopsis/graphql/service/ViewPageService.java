@@ -17,6 +17,7 @@ public class ViewPageService {
     private final SmdService smdService;
     private final ScsService scsService;
 
+    private final ViewPageConverter viewPageConverter;
 
     public ViewPage getViewPageResult(RequestData requestData) {
         RequestEuxpData requestEuxpData = new RequestEuxpData(requestData);
@@ -29,6 +30,6 @@ public class ViewPageService {
                 .scsResult(scsService.getScsResult(requestScsData))
             .build();
 
-        return ViewPageConverter.convert(synopsisData);
+        return viewPageConverter.convert(synopsisData);
     }
 }

@@ -15,7 +15,6 @@ import synopsis.graphql.excpetion.EuxpRequestException;
 import synopsis.graphql.model.dto.request.RequestEuxpData;
 import synopsis.graphql.model.euxp.EuxpResult;
 import synopsis.graphql.util.converter.EuxpJsonToObjectConverter;
-import synopsis.graphql.util.converter.JsonToObjectConverter;
 
 @RequiredArgsConstructor
 @Service
@@ -23,8 +22,7 @@ public class EuxpService {
 
     private final RestTemplate restTemplate;
     private final EuxpConfig euxpConfig;
-    private final JsonToObjectConverter<EuxpResult> euxpConverter = new EuxpJsonToObjectConverter();
-
+    private final EuxpJsonToObjectConverter euxpConverter;
 
     public EuxpResult getEuxpResult(RequestEuxpData requestEuxpData) {
         ResponseEntity<String> response = getEuxpResponse(requestEuxpData);
