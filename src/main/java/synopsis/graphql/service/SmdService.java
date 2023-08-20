@@ -2,14 +2,13 @@ package synopsis.graphql.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 import synopsis.graphql.config.SmdConfig;
 import synopsis.graphql.excpetion.ResultDataNotFoundException;
 import synopsis.graphql.excpetion.SmdRequestException;
@@ -22,25 +21,35 @@ import synopsis.graphql.util.converter.SmdJsonToObjectConverter;
 @Service
 public class SmdService {
 
+    private final WebClient webClient;
     private final SmdConfig smdConfig;
-    private final RestTemplate restTemplate;
     private final SmdJsonToObjectConverter smdConverter;
 
 
     public SmdResult getSmdResult(RequestSmdData requestSmdData) {
-        ResponseEntity<String> response = getSmdResponse(requestSmdData);
-        return smdConverter.convert(response.getBody())
+        String response = String.valueOf(fetchSmdResponse(requestSmdData));
+        return smdConverter.convert(response)
                 .orElseThrow(() -> new ResultDataNotFoundException("SMD Result data not found"));
     }
 
-    public ResponseEntity<String> getSmdResponse(RequestSmdData requestSmdData) {
+    public Mono<SmdResult> fetchSmdResponse(RequestSmdData requestSmdData) {
         String url = constructUrl(requestSmdData);
-        HttpEntity<Void> entity = new HttpEntity<>(constructHeaders());
-        try {
-            return restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-        } catch (RestClientException e) {
-            throw new SmdRequestException("SMD 시스템에 GET 요청 실패 | " + e.getMessage());
-        }
+        HttpHeaders headers = constructHeaders();
+
+        return webClient.get()
+                .uri(url)
+                .headers(h -> h.addAll(headers))
+                .retrieve()
+                .bodyToMono(SmdResult.class)
+                .onErrorReturn(null)
+                .onErrorResume(WebClientException.class, e -> {
+                    log.error("SMD 시스템에 GET 요청 실패 : " + e.getMessage());
+                    throw new SmdRequestException("SMD 시스템에 GET 요청 실패 | " + e.getMessage());
+                })
+                .onErrorResume(e -> {
+                    log.error("SMD GET Request failed : " + e.getMessage());
+                    return Mono.empty();
+                });
     }
 
     private HttpHeaders constructHeaders() {

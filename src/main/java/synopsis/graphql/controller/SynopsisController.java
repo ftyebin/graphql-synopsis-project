@@ -9,6 +9,7 @@ import synopsis.graphql.model.dto.request.RequestEuxpData;
 import synopsis.graphql.model.dto.request.RequestScsData;
 import synopsis.graphql.model.dto.request.RequestSmdData;
 import synopsis.graphql.model.dto.response.SynopsisData;
+import synopsis.graphql.model.dto.response.ViewPageFetchResult;
 import synopsis.graphql.model.viewpage.ViewPage;
 import synopsis.graphql.service.*;
 
@@ -16,11 +17,11 @@ import synopsis.graphql.service.*;
 @Controller
 @RequiredArgsConstructor
 public class SynopsisController {
+    private final ViewPageService viewPageService;
 
     private final EuxpService euxpService;
     private final SmdService smdService;
     private final ScsService scsService;
-    private final ViewPageService viewPageService;
 
     @QueryMapping
     public SynopsisData synopsisView(@Argument RequestData requestData) {
@@ -33,11 +34,17 @@ public class SynopsisController {
                 .euxpResult(euxpService.getEuxpResult(requestEuxpData))
                 .smdResult(smdService.getSmdResult(requestSmdData))
                 .scsResult(scsService.getScsResult(requestScsData))
-            .build();
+                .build();
     }
+
 
     @QueryMapping
     public ViewPage synopsisPage(@Argument RequestData requestData) {
         return viewPageService.getViewPageResult(requestData);
+    }
+
+    @QueryMapping
+    public ViewPageFetchResult synopsisPageWithErrors(@Argument RequestData requestData) {
+        return viewPageService.getViewPageWithRErrors(requestData);
     }
 }

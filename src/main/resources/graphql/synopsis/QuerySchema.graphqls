@@ -1,7 +1,9 @@
 type Query {
-    synopsisPage (requestData: RequestData): ViewPage,
+    synopsisPage (requestData: RequestData!): ViewPage,
 
-    synopsisView (requestData: RequestData): SynopsisView,
+    synopsisPageWithErrors (requestData: RequestData!) : ViewPageFetchResult,
+
+    synopsisView (requestData: RequestData!): SynopsisView,
 
     getEuxpResult(
         stbId: String,

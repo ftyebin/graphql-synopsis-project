@@ -1,3 +1,8 @@
+type ViewPageFetchResult {
+    viewPage: ViewPage
+    errors: [Error]
+}
+
 type ViewPage {
     banners: SynopsisBanner
     title: ContentsTitle
@@ -9,11 +14,9 @@ type ViewPage {
     playInfo: PlayInfo
 }
 
-enum SynopsisType {
-    SHORTS
-    SEASON
+type Error {
+    message: String
 }
-
 type SynopsisBanner {
     imageBanner: SynopsisImageBanner
     textBanner: SynopsisTextBanner

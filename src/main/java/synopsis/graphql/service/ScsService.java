@@ -2,17 +2,16 @@ package synopsis.graphql.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
+import reactor.core.publisher.Mono;
 import synopsis.graphql.config.ScsConfig;
 import synopsis.graphql.excpetion.ResultDataNotFoundException;
-import synopsis.graphql.excpetion.ScsRequestException;
+import synopsis.graphql.excpetion.SmdRequestException;
 import synopsis.graphql.model.dto.request.CustomScsPpvProducts;
 import synopsis.graphql.model.dto.request.CustomScsRequestBody;
 import synopsis.graphql.model.dto.request.RequestScsData;
@@ -33,30 +32,18 @@ public class ScsService {
     private static final String RESPONSE_FORMAT = "json";
     private static final String VERSION = "5.3.0";
 
+    private final WebClient webClient;
     private final ScsConfig scsConfig;
-    private final RestTemplate restTemplate;
     private final ScsJsonToObjectConverter scsConverter;
 
-
-    private CustomScsPpvProducts toCustomPpvProducts(RequestScsPpvProduct product) {
-        log.info(product.toString());
-        return CustomScsPpvProducts.builder()
-                .prd_prc_id(product.getProductPriceId())
-                .yn_prd_nscreen(product.getIsNScreen())
-                .prd_typ_cd((product.getProductTypeCode()))
-                .purc_pref_rank(product.getPurchasePreferenceRank())
-                .possn_yn(product.getIsPossession())
-                .epsd_id(product.getEpisodeId())
-            .build();
-    }
-
     public ScsResult getScsResult(RequestScsData requestScsData){
-        ResponseEntity<String> response = getScsResponse(requestScsData);
-        return scsConverter.convert(response.getBody())
+        String response = String.valueOf(fetchScsResponse(requestScsData));
+        return scsConverter.convert(response)
                 .orElseThrow(() -> new ResultDataNotFoundException("SCS Result data not found"));
     }
 
-    public ResponseEntity<String> getScsResponse(RequestScsData requestScsData) {
+
+    public Mono<ScsResult> fetchScsResponse(RequestScsData requestScsData) {
         List<CustomScsPpvProducts> customScsPpvProducts =
                 Optional.ofNullable(requestScsData.getPpvProducts())
                         .orElse(Collections.emptyList())
@@ -93,16 +80,35 @@ public class ScsService {
                 .build();
     }
 
-    private ResponseEntity<String> sendScsRequest(CustomScsRequestBody body, HttpHeaders headers) {
-        try {
-            return restTemplate.exchange(
-                    scsConfig.getUrl(),
-                    HttpMethod.POST,
-                    new HttpEntity<>(body, headers),
-                    String.class
-            );
-        } catch (RestClientException e) {
-            throw new ScsRequestException("Scs 시스템에 POST 요청 실패. URL: " + scsConfig.getUrl() + " | Error: " + e.getMessage());
-        }
+
+    private CustomScsPpvProducts toCustomPpvProducts(RequestScsPpvProduct product) {
+        log.info(product.toString());
+        return CustomScsPpvProducts.builder()
+                .prd_prc_id(product.getProductPriceId())
+                .yn_prd_nscreen(product.getIsNScreen())
+                .prd_typ_cd((product.getProductTypeCode()))
+                .purc_pref_rank(product.getPurchasePreferenceRank())
+                .possn_yn(product.getIsPossession())
+                .epsd_id(product.getEpisodeId())
+                .build();
+    }
+
+
+    private Mono<ScsResult> sendScsRequest(CustomScsRequestBody body, HttpHeaders headers) {
+        return webClient.post()
+                .uri(scsConfig.getUrl())
+                .headers(h -> h.addAll(headers))
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(ScsResult.class)
+                .onErrorResume(WebClientException.class, e -> {
+                    log.error("SCS 시스템에 POST 요청 실패 : " + e.getMessage());
+                    throw new SmdRequestException("SMD 시스템에 GET 요청 실패 | " + e.getMessage());
+                })
+                .onErrorResume(e -> {
+                    log.error("SCS POST Request failed : " + e.getMessage());
+                    return Mono.empty();
+                });
+
     }
 }

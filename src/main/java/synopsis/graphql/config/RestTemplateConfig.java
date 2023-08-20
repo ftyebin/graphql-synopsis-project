@@ -7,7 +7,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import java.time.Duration;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @Component
 @Getter
@@ -15,12 +15,15 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class RestTemplateConfig {
 
-    private static final int DURATION_TIME_MILLIS = 500;
+    private static final int DURATION_TIME_MILLIS = 5000;
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder
-                .setConnectTimeout(Duration.ofMillis(DURATION_TIME_MILLIS))
-                .setReadTimeout(Duration.ofMillis(DURATION_TIME_MILLIS))
-                .build();
+        DefaultUriBuilderFactory defaultUriBuilderFactory = new DefaultUriBuilderFactory();
+        defaultUriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setUriTemplateHandler(defaultUriBuilderFactory);
+
+        return restTemplate;
     }
 }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import synopsis.graphql.excpetion.JsonConversionException;
 import synopsis.graphql.excpetion.JsonPropertyException;
 import synopsis.graphql.excpetion.JsonToObjectException;
 
@@ -23,6 +22,7 @@ public abstract class AbstractJsonToObjectConverter<T> implements JsonToObjectCo
     public Optional<T> convert(String jsonData) {
 
         String errorMessage;
+        log.info(jsonData);
 
         try {
             return Optional.ofNullable(objectMapper.readValue(jsonData, type));
@@ -34,7 +34,7 @@ public abstract class AbstractJsonToObjectConverter<T> implements JsonToObjectCo
         } catch (Exception e) {
             errorMessage = String.format("%s 에서 Json 데이터 변환 실패 : %s", typeName, e);
             log.error(errorMessage);
-            throw new JsonConversionException(errorMessage);
+            return Optional.empty();
         }
     }
 }
