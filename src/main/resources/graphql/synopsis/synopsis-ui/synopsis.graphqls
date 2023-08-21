@@ -4,6 +4,7 @@ type ViewPageFetchResult {
 }
 
 type ViewPage {
+    type: SynopsisType
     banners: SynopsisBanner
     title: ContentsTitle
     details: ContentsDetail
@@ -12,6 +13,11 @@ type ViewPage {
     episodeList: ContentsEpisodeList
     purchaseInfo: PurchaseInfo
     playInfo: PlayInfo
+}
+
+enum SynopsisType {
+    SEASON,
+    SHORTS
 }
 
 type Error {

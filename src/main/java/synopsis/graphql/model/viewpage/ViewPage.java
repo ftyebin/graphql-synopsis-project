@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ViewPage {
+    private SynopsisType type;
     private SynopsisBanner banners;
     private ContentsTitle title;
     private ContentsDetail details;

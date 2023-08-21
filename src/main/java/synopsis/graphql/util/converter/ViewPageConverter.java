@@ -24,6 +24,7 @@ public class ViewPageConverter {
 
     private List<Error> errors = new ArrayList<>();
 
+    private final SynopsisTypeConverter synopsisTypeConverter;
     private final SynopsisBannerConverter synopsisBannerConverter;
     private final ContentsTitleConverter contentsTitleConverter;
     private final ContentsDetailConverter contentsDetailConverter;
@@ -38,15 +39,12 @@ public class ViewPageConverter {
         EuxpResult euxpResult = getEuxpResult(synopsisData);
         SmdResult smdResult = getSmdResult(synopsisData);
         ScsResult scsResult = getScsResult(synopsisData);
-        log.info(String.valueOf(euxpResult));
-        log.info(String.valueOf(smdResult));
-        log.info(String.valueOf(scsResult));
 
         errors = validateSynopsisData(synopsisData);
 
         Contents euxpContents = euxpResult.getContents();
 
-
+        SynopsisType synopsisType = synopsisTypeConverter.convert(euxpResult);
         SynopsisBanner synopsisBanner = null;
         ContentsTitle contentsTitle = null;
         ContentsDetail contentsDetail = null;
@@ -74,6 +72,7 @@ public class ViewPageConverter {
         return ViewPageFetchResult.builder()
                 .viewPage(
                         ViewPage.builder()
+                            .type(synopsisType)
                             .banners(synopsisBanner)
                             .title(contentsTitle)
                             .details(contentsDetail)
