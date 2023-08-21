@@ -28,13 +28,10 @@ public class ViewPageService {
     private final ViewPageConverter viewPageConverter;
 
     public ViewPage getViewPageResult(RequestData requestData) {
-        RequestEuxpData requestEuxpData = new RequestEuxpData(requestData);
-        RequestSmdData requestSmdData = new RequestSmdData(requestData);
-        RequestScsData requestScsData = new RequestScsData(requestData);
 
-        EuxpResult euxpResult = euxpService.fetchEuxpResponse(requestEuxpData).block();
-        SmdResult smdResult = smdService.fetchSmdResponse(requestSmdData).block();
-        ScsResult scsResult = scsService.fetchScsResponse(requestScsData).block();
+        EuxpResult euxpResult = euxpService.fetchEuxpResponse(new RequestEuxpData(requestData)).block();
+        SmdResult smdResult = smdService.fetchSmdResponse(new RequestSmdData(requestData)).block();
+        ScsResult scsResult = scsService.fetchScsResponse(new RequestScsData(requestData)).block();
 
         SynopsisData synopsisData = SynopsisData.builder()
                 .euxpResult(euxpResult)

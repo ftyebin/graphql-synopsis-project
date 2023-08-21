@@ -3,7 +3,6 @@ package synopsis.graphql.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.reactive.function.client.WebClient;
@@ -103,12 +102,11 @@ public class ScsService {
                 .bodyToMono(ScsResult.class)
                 .onErrorResume(WebClientException.class, e -> {
                     log.error("SCS 시스템에 POST 요청 실패 : " + e.getMessage());
-                    throw new SmdRequestException("SMD 시스템에 GET 요청 실패 | " + e.getMessage());
+                    throw new SmdRequestException("SCS 시스템에 GET 요청 실패 | " + e.getMessage());
                 })
                 .onErrorResume(e -> {
                     log.error("SCS POST Request failed : " + e.getMessage());
-                    return Mono.empty();
+                    throw new SmdRequestException("SCS 시스템에 GET 요청 실패 | " + e.getMessage());
                 });
-
     }
 }

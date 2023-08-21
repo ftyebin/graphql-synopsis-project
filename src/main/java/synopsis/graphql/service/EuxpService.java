@@ -10,8 +10,8 @@ import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import synopsis.graphql.config.EuxpConfig;
+import synopsis.graphql.excpetion.EuxpRequestException;
 import synopsis.graphql.excpetion.ResultDataNotFoundException;
-import synopsis.graphql.excpetion.SmdRequestException;
 import synopsis.graphql.model.dto.request.RequestEuxpData;
 import synopsis.graphql.model.euxp.EuxpResult;
 import synopsis.graphql.util.converter.EuxpJsonToObjectConverter;
@@ -41,14 +41,13 @@ public class EuxpService {
                 .headers(h -> h.addAll(headers))
                 .retrieve()
                 .bodyToMono(EuxpResult.class)
-                .onErrorReturn(null)
                 .onErrorResume(WebClientException.class, e -> {
                     log.error("EUXP 시스템에 GET 요청 실패 : " + e.getMessage());
-                    throw new SmdRequestException("EUXP 시스템에 GET 요청 실패 | " + e.getMessage());
+                    throw new EuxpRequestException("EUXP 시스템에 GET 요청 실패 | " + e.getMessage());
                 })
                 .onErrorResume(e -> {
                     log.error("EUXP GET Request failed : " + e.getMessage());
-                    return Mono.empty();
+                    throw new EuxpRequestException("EUXP 시스템에 GET 요청 실패 | " + e.getMessage());
                 });
     }
 
