@@ -345,7 +345,7 @@ type Contents {
     actor: String
     guest: String
     chrtr: String
-    corners: String
+    corners: [Corner]
     ending_cw_call_id_val: String
     menu_id: String
     session_id: String
@@ -392,4 +392,17 @@ type Contents {
     special: [String]
     preview: [Preview]
     poss_bg_img: [PossBgImg]
+}
+
+type Corner {
+    cnr_id: String
+    cnr_nm: String
+    epsd_rslu_id: String
+    img_path: String
+    wat_fr_byte_val: String
+    tmtag_fr_tmsc: String
+    sort_seq: String
+    cnr_grp_id: String
+    cnr_btm_nm: String
+    cnr_typ_cd: String
 }

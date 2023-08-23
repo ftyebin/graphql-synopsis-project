@@ -43,9 +43,9 @@ public class Contents {
     public String kids_yn;
     public String lag_capt_typ_exps_yn;
     public String brcast_avl_perd_yn;
-    public Object series_info;
+    public SeriesInfo series_info;
     public List<Preview> preview;
-    public List<Object> special;
+    public List<Special> special;
     public String sris_sales_comt_title;
     public String sris_sales_comt_cts;
     public String sris_sales_comt_exps_mthd_cd;
@@ -64,7 +64,9 @@ public class Contents {
     public String sris_evt_comt_call_typ_cd;
     public String sris_evt_comt_call_url;
     public String sris_evt_comt_call_objt_id;
+    public String sris_evt_comt_call_objt_id2;
     public String sris_evt_vas_svc_id;
+    public String sris_evt_vas_svc_id2;
     public String sris_evt_vas_itm_id;
     public String sris_evt_comt_title2;
     public String sris_evt_comt_cts2;
@@ -149,7 +151,7 @@ public class Contents {
     public String pre_exam_yn;
     public String trailer_view_yn;
     public List<Object> products;
-    public List<Object> ai_inside_scenes;
+    public List<AiInsideScenes> ai_inside_scenes;
     public List<Object> all_ai_inside_scenes;
     public List<EpsdRsluInfo> epsd_rslu_info;
     public List<People> peoples;
@@ -161,7 +163,7 @@ public class Contents {
     public String actor;
     public String guest;
     public String chrtr;
-    public Object corners;
+    public List<Corner> corners;
     public SiteReview site_review;
     public String ending_cw_call_id_val;
     public String menu_id;

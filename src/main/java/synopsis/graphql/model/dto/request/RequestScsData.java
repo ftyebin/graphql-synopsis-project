@@ -14,8 +14,6 @@ public class RequestScsData {
     private String uiName;
     private List<RequestScsPpvProduct> ppvProducts;
 
-    public RequestScsData() {}
-
     public RequestScsData(RequestData requestData) {
         this.stbId = requestData.getStbId();
         this.hashId = requestData.getHashId();

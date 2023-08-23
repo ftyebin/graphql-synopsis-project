@@ -1,4 +1,4 @@
-input RequestData{
+input RequestData {
     stbId: String
     mac: String
     hashId: String
