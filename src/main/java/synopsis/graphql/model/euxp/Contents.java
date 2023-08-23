@@ -1,7 +1,10 @@
 package synopsis.graphql.model.euxp;
 
+import lombok.Data;
+
 import java.util.List;
 
+@Data
 public class Contents {
     public String sris_id;
     public String sris_typ_cd;

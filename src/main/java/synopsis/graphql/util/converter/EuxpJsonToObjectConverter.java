@@ -11,4 +11,5 @@ public class EuxpJsonToObjectConverter extends AbstractJsonToObjectConverter<Eux
         super(EuxpResult.class, "EUXP", objectMapper);
     }
 
+
 }
