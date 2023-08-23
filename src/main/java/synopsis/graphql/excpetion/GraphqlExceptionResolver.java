@@ -32,14 +32,11 @@ public class GraphqlExceptionResolver extends DataFetcherExceptionResolverAdapte
     );
 
     @Override
-    protected List<GraphQLError> resolveToMultipleErrors(Throwable ex, DataFetchingEnvironment env)  {
-        GraphQLError graphQLError = Optional.ofNullable(exceptionToErrorTypeMap.get(ex.getClass()))
+    protected GraphQLError resolveToSingleError(Throwable ex, @NotNull DataFetchingEnvironment env)  {
+        return (Optional.ofNullable(exceptionToErrorTypeMap.get(ex.getClass()))
                 .map(errorType -> buildGraphQLError(errorType, ex, env))
-                .orElse(null);
-        return (graphQLError != null ? Collections.singletonList(graphQLError) : Collections.emptyList());
-
+                .orElse(null));
     }
-
 
     private GraphQLError buildGraphQLError(ErrorType errorType, Throwable ex, DataFetchingEnvironment env) {
         GraphQLError graphQLError = GraphqlErrorBuilder.newError()
