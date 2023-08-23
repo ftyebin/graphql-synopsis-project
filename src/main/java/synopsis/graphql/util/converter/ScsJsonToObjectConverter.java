@@ -1,26 +1,13 @@
 package synopsis.graphql.util.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import synopsis.graphql.model.scs.ScsResult;
 
-@Slf4j
-public
-class ScsJsonToObjectConverter {
+@Service
+public class ScsJsonToObjectConverter extends AbstractJsonToObjectConverter<ScsResult> {
 
-    private ScsJsonToObjectConverter() {
-        throw new IllegalStateException("Scs Json To Object Converter");
-    }
-
-    public static ScsResult convert(String jsonData) throws RuntimeException {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        try {
-            return objectMapper.readValue(jsonData, ScsResult.class);
-
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public ScsJsonToObjectConverter(ObjectMapper objectMapper) {
+        super(ScsResult.class, "SCS", objectMapper);
     }
 }
