@@ -2,30 +2,56 @@ package synopsis.graphql.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
+
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 import synopsis.graphql.config.EuxpConfig;
+import synopsis.graphql.excpetion.EuxpRequestException;
+import synopsis.graphql.excpetion.ResultDataNotFoundException;
 import synopsis.graphql.model.dto.request.RequestEuxpData;
 import synopsis.graphql.model.euxp.EuxpResult;
 import synopsis.graphql.util.converter.EuxpJsonToObjectConverter;
 
 @RequiredArgsConstructor
-@Slf4j
 @Service
+@Slf4j
 public class EuxpService {
-    private final RestTemplate restTemplate;
+
+    private final WebClient webClient;
     private final EuxpConfig euxpConfig;
+    private final EuxpJsonToObjectConverter euxpConverter;
 
     public EuxpResult getEuxpResult(RequestEuxpData requestEuxpData) {
-        HttpHeaders headers = new HttpHeaders();
-        euxpConfig.getHeaders().forEach(headers::set);
+        String response = String.valueOf(fetchEuxpResponse(requestEuxpData));
+        return euxpConverter.convert(response)
+                .orElseThrow(() -> new ResultDataNotFoundException("EUXP Result data not found"));
+    }
 
+    public Mono<EuxpResult> fetchEuxpResponse(RequestEuxpData requestEuxpData) {
+        String url = constructUrl(requestEuxpData);
+        HttpHeaders headers = constructHeaders();
 
+        log.info("WEBclient for euxp");
+        return webClient.get()
+                .uri(url)
+                .headers(h -> h.addAll(headers))
+                .retrieve()
+                .bodyToMono(EuxpResult.class)
+                .onErrorResume(WebClientException.class, e -> {
+                    log.error("EUXP 시스템에 GET 요청 실패 : " + e.getMessage());
+                    throw new EuxpRequestException("EUXP 시스템에 GET 요청 실패 | " + e.getMessage());
+                })
+                .onErrorResume(e -> {
+                    log.error("EUXP GET Request failed : " + e.getMessage());
+                    throw new EuxpRequestException("EUXP 시스템에 GET 요청 실패 | " + e.getMessage());
+                });
+    }
+
+    private String constructUrl(RequestEuxpData requestEuxpData) {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(euxpConfig.getUrl())
                 .queryParam("stb_id", requestEuxpData.getStbId())
                 .queryParam("search_type", requestEuxpData.getSynopsisSearchType())
@@ -33,20 +59,19 @@ public class EuxpService {
                 .queryParam("menu_stb_svc_id", requestEuxpData.getMenuStbServiceId())
                 .queryParam("epsd_id", requestEuxpData.getEpisodeId());
 
-        euxpConfig.getParams().forEach(uriComponentsBuilder::queryParam);
+        if (euxpConfig.getParams() != null) {
+            euxpConfig.getParams().forEach(uriComponentsBuilder::queryParam);
+        }
+        log.info(uriComponentsBuilder.toUriString());
+        return uriComponentsBuilder.toUriString();
+    }
 
-        String url = uriComponentsBuilder.toUriString();
-
-        HttpEntity<Object> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
-
-        log.info(response.getBody());
-
-        return EuxpJsonToObjectConverter.convert(response.getBody());
+    private HttpHeaders constructHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        if (euxpConfig != null && euxpConfig.getHeaders() != null ) {
+            euxpConfig.getHeaders().forEach(headers::set);
+        }
+        log.info(headers.toString());
+        return headers;
     }
 }
